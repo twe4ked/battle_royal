@@ -14,8 +14,9 @@ var throttle = function(type, name, obj) {
 
 throttle("resize", "optimizedResize");
 
+var app;
 function main() {
-  var app = new PIXI.Application(800, 600, {backgroundColor : 0x000000});
+  app = new PIXI.Application(800, 600, {backgroundColor : 0x000000});
   document.body.appendChild(app.view);
 
   app.renderer.view.style.position = "absolute";
@@ -27,9 +28,18 @@ function main() {
     app.renderer.resize(window.innerWidth, window.innerHeight);
   });
 
-  app.ticker.add(function(delta) {
-    // TODO
-  });
+  state = play;
+  gameLoop()
 };
+
+function gameLoop() {
+  requestAnimationFrame(gameLoop);
+  state();
+  app.renderer.render(app.stage);
+}
+
+function play() {
+  // TODO
+}
 
 document.addEventListener("DOMContentLoaded", main)
