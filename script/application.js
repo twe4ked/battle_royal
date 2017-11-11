@@ -242,6 +242,8 @@ function setup() {
 
   window.addEventListener("optimizedResize", function() {
     app.renderer.resize(window.innerWidth, window.innerHeight);
+    clearFogOfWar()
+    redrawFogOfWar()
   });
 
   setupStage();
@@ -263,6 +265,9 @@ function setup() {
   controls = setupControls();
   setupHealthBar()
   setupPlayersRemainingBar()
+
+
+  redrawFogOfWar();
 
   socket = io();
   socket.emit("announce", { name: player.id });
@@ -327,31 +332,7 @@ function play() {
         player.sprite.x = player.x;
         player.sprite.y = player.y;
 
-        if (outerFogOfWar === undefined) {
-          innerFogOfWar = new PIXI.Graphics();
-          innerFogOfWar.lineStyle(window.innerWidth / 7, 0x000000, 0.8);
-          innerFogOfWar.beginFill(0x000000, 0);
-          innerFogOfWar.drawCircle(0, 0, window.innerWidth / 3.5);
-          innerFogOfWar.endFill();
-          innerFogOfWar.x = player.x;
-          innerFogOfWar.y = player.y;
-          fogOfWarContainer.addChild(innerFogOfWar);
-
-          outerFogOfWar = new PIXI.Graphics();
-          outerFogOfWar.lineStyle(window.innerWidth / 3, 0x000000, 1);
-          outerFogOfWar.beginFill(0x000000, 0.1);
-          outerFogOfWar.drawCircle(0, 0, window.innerWidth / 2);
-          outerFogOfWar.endFill();
-          outerFogOfWar.x = player.x;
-          outerFogOfWar.y = player.y;
-          fogOfWarContainer.addChild(outerFogOfWar);
-
-        } else {
-          innerFogOfWar.x = player.x;
-          innerFogOfWar.y = player.y;
-          outerFogOfWar.x = player.x;
-          outerFogOfWar.y = player.y;
-        }
+        redrawFogOfWar()
       }
     }
 
@@ -374,6 +355,41 @@ function play() {
   projectiles = projectiles.filter(function(projectile) {
     return !(projectile.vx == 0 && projectile.vy == 0)
   })
+}
+
+function clearFogOfWar() {
+  fogOfWarContainer.children = []
+}
+
+function redrawFogOfWar() {
+  var baseSize = Math.max(window.innerWidth, window.innerHeight);
+
+  if (fogOfWarContainer.children.length == 0) {
+    if (baseSize > 640) {
+      innerFogOfWar = new PIXI.Graphics();
+      innerFogOfWar.lineStyle(baseSize / 7, 0x000000, 0.8);
+      innerFogOfWar.beginFill(0x000000, 0);
+      innerFogOfWar.drawCircle(0, 0, baseSize / 3.5);
+      innerFogOfWar.endFill();
+      innerFogOfWar.x = player.x;
+      innerFogOfWar.y = player.y;
+      fogOfWarContainer.addChild(innerFogOfWar);
+    }
+
+    outerFogOfWar = new PIXI.Graphics();
+    outerFogOfWar.lineStyle(baseSize / 3, 0x000000, 1);
+    outerFogOfWar.beginFill(0x000000, 0.1);
+    outerFogOfWar.drawCircle(0, 0, baseSize / 2);
+    outerFogOfWar.endFill();
+    outerFogOfWar.x = player.x;
+    outerFogOfWar.y = player.y;
+    fogOfWarContainer.addChild(outerFogOfWar);
+  } else {
+    innerFogOfWar.x = player.x;
+    innerFogOfWar.y = player.y;
+    outerFogOfWar.x = player.x;
+    outerFogOfWar.y = player.y;
+  }
 }
 
 function centreViewportOnPlayer() {
