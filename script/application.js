@@ -139,6 +139,7 @@ function setupHealthBar() {
   message.y = 2;
 
   healthBar.outer = outerBar;
+  healthBar.message = message;
 
   healthBar.addChild(message);
   overlayContainer.addChild(healthBar);
@@ -387,7 +388,8 @@ function reducePlayerHealth() {
 }
 
 function playerDead() {
-  console.log('You have died')
+  healthBar.message.text = " ☠️ ";
+  socket.emit("player_dead", { playerId: player.id });
 }
 
 function isClippableAt(x, y) {

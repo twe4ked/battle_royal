@@ -16,7 +16,7 @@ app.get("*", function(req, res) {
 
 io.on("connection", function(socket) {
   socket.on("announce", function(player) {
-    clients[player.name] = { name: player.name, socket: socket.id };
+    clients[player.name] = { name: player.name, socket: socket.id, health: 5, alive: true };
   });
 
   socket.on("moved", function(locationMsg) {
@@ -38,8 +38,15 @@ io.on("connection", function(socket) {
     io.emit("shotsFired", payload)
   });
 
-  socket.on("player_hit", function(hitMsg) {
-    io.emit("player_hit", hitMsg);
+  socket.on("player_hit", function(msg) {
+    clients[msg.playerId].health -= 1;
+    io.emit("player_hit", msg);
+  });
+
+  socket.on("player_dead", function(msg) {
+    clients[msg.playerId].health = 0;
+    clients[msg.playerId].alive = false;
+    io.emit("player_dead", msg);
   });
 
   socket.on("disconnect", function() {
