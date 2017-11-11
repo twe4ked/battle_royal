@@ -210,6 +210,11 @@ function setup() {
     }
   });
 
+  socket.on("shotsFired", function({id, projectile}) {
+    if (id == player.id) { return; }
+    registerProjectile(projectile)
+  })
+
   state = play;
   gameLoop();
 }
@@ -297,28 +302,55 @@ function renderInitialTiles() {
   }
 }
 
+function registerProjectile({x, y, vx, vy}) {
+  var sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Projectile"]);
+  sprite.x = x
+  sprite.y = y
+  sprite.vx = vx
+  sprite.vy = vy
+
+  sprite.anchor.set(0.5);
+
+  app.stage.addChild(sprite)
+  projectiles.push(sprite)
+}
+
+function calculateProjectileFromPlayer() {
+  var projectile = {vx: 0, vy: 0}
+
+  if (playerLastDirection == 'up') {
+    projectile.vy = -projectileSpeed;
+  } else if (playerLastDirection == 'down') {
+    projectile.vy = projectileSpeed;
+  } else if (playerLastDirection == 'left') {
+    projectile.vx = -projectileSpeed;
+  } else if (playerLastDirection == 'right') {
+    projectile.vx = projectileSpeed;
+  }
+
+  projectile.x = player.x
+  projectile.y = player.y
+
+  return projectile
+}
+
+function notifyServerOfShotFired(projectile) {
+    socket.emit('shotsFired', {
+      id: player.id,
+      projectile: {
+        x: projectile.x,
+        y: projectile.y,
+        vx: projectile.vx,
+        vy: projectile.vy
+      }
+    })
+}
+
 function tryShoot() {
   if (canShootNext <= gameTick) {
-    var projectile = new PIXI.Sprite(PIXI.utils.TextureCache["Projectile"]);
-    projectile.vy = 0
-    projectile.vx = 0
-
-    if (playerLastDirection == 'up') {
-      projectile.vy = -projectileSpeed;
-    } else if (playerLastDirection == 'down') {
-      projectile.vy = projectileSpeed;
-    } else if (playerLastDirection == 'left') {
-      projectile.vx = -projectileSpeed;
-    } else if (playerLastDirection == 'right') {
-      projectile.vx = projectileSpeed;
-    }
-
-    projectile.x = player.x
-    projectile.y = player.y
-    projectile.anchor.set(0.5);
-
-    app.stage.addChild(projectile);
-    projectiles.push(projectile)
+    projectile = calculateProjectileFromPlayer()
+    registerProjectile(projectile)
+    notifyServerOfShotFired(projectile)
 
     canShootNext = gameTick + 30;
   }

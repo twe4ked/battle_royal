@@ -32,6 +32,11 @@ io.on("connection", function(socket) {
     };
   });
 
+  socket.on("shotsFired", function(payload) {
+    console.log("Shot fired!", payload)
+    io.emit("shotsFired", payload)
+  })
+
   socket.on("disconnect", function() {
     console.log(`Disconnecting ${socket.id}`)
     var newClients = {}
