@@ -85,7 +85,6 @@ function setupKeyHandling() {
     player.vx = -playerMovementSpeed;
     playerLastDirection = 'left';
   }
-
   aKey.release = leftKey.release = function() {
     if (player.vx < 0) {
       player.vx = 0
@@ -96,7 +95,6 @@ function setupKeyHandling() {
     player.vy = -playerMovementSpeed;
     playerLastDirection = 'up';
   };
-
   wKey.release = upKey.release = function() {
     if (player.vy < 0) {
       player.vy = 0;
@@ -117,7 +115,6 @@ function setupKeyHandling() {
     player.vy = playerMovementSpeed;
     playerLastDirection = 'down';
   };
-
   sKey.release = downKey.release = function() {
     if (player.vy > 0) {
       player.vy = 0;
