@@ -215,10 +215,6 @@ function play() {
   projectiles = projectiles.filter(function(projectile) {
     return  (projectile.vx != 0 || projectile.vy != 0)
   })
-
-  if (gameTick % 60 == 0) {
-    socket.emit('game', {name: window.location.hash});
-  }
 }
 
 function centreViewportOnPlayer() {
