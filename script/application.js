@@ -480,7 +480,7 @@ function reducePlayerHealth() {
 }
 
 function playerDead() {
-  healthBar.message.text = " ☠️ ";
+  healthBar.message.text = " \u2620 "; // SKULL AND CROSSBONES
   showDeathScreen();
   socket.emit("playerDead", { playerId: player.id });
 }
