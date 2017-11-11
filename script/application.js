@@ -14,6 +14,36 @@ var throttle = function(type, name, obj) {
 
 throttle("resize", "optimizedResize");
 
+function keyboard(keyCode) {
+  var key = {};
+  key.code = keyCode;
+  key.isDown = false;
+  key.isUp = true;
+  key.press = undefined;
+  key.release = undefined;
+
+  key.downHandler = function(event) {
+    if (event.keyCode === key.code) {
+      if (key.isUp && key.press) key.press();
+      key.isDown = true;
+      key.isUp = false;
+    }
+    event.preventDefault();
+  };
+
+  key.upHandler = function(event) {
+    if (event.keyCode === key.code) {
+      if (key.isDown && key.release) key.release();
+      key.isDown = false;
+      key.isUp = true;
+    }
+    event.preventDefault();
+  };
+
+  window.addEventListener("keydown", key.downHandler.bind(key), false);
+  window.addEventListener("keyup", key.upHandler.bind(key), false);
+  return key;
+}
 
 var app = new PIXI.Application(mapSize, mapSize, {backgroundColor : 0x000000});
 var tileSize = 32;
@@ -25,6 +55,7 @@ function main() {
     .load(setup);
 }
 
+var player;
 function setup() {
   document.body.appendChild(app.view);
 
@@ -38,6 +69,50 @@ function setup() {
   });
 
   renderInitialTiles()
+
+  player = new PIXI.Sprite(PIXI.utils.TextureCache["explorer.png"]);
+  player.vx = 0;
+  player.vy = 0;
+  player.anchor.set(0.5);
+
+  player.x = app.renderer.width / 2;
+  player.y = app.renderer.height / 2;
+
+  app.stage.addChild(player);
+
+  var leftKey = keyboard(37),
+    upKey = keyboard(38),
+    rightKey = keyboard(39),
+    downKey = keyboard(40);
+
+  leftKey.press = function() {
+    player.vx = -5;
+  };
+  leftKey.release = function() {
+    player.vx = 0;
+  };
+
+  upKey.press = function() {
+    player.vy = -5;
+  };
+  upKey.release = function() {
+    player.vy = 0;
+  };
+
+  rightKey.press = function() {
+    player.vx = 5;
+  };
+  rightKey.release = function() {
+    player.vx = 0;
+  };
+
+  downKey.press = function() {
+    player.vy = 5;
+  };
+  downKey.release = function() {
+    player.vy = 0;
+  };
+
   state = play;
   gameLoop()
 };
@@ -49,7 +124,8 @@ function gameLoop() {
 }
 
 function play() {
-  // TODO
+  player.x += player.vx;
+  player.y += player.vy;
 }
 
 function renderInitialTiles() {
