@@ -1,3 +1,7 @@
+var app = new PIXI.Application(mapSize, mapSize, {backgroundColor : 0x000000});
+var tileSize = 32;
+var mapSize = tileSize * 64;  // 2048 x 2048 arena
+
 var throttle = function(type, name, obj) {
   obj = obj || window;
   var running = false;
@@ -45,9 +49,6 @@ function keyboard(keyCode) {
   return key;
 }
 
-var app = new PIXI.Application(mapSize, mapSize, {backgroundColor : 0x000000});
-var tileSize = 32;
-var mapSize = tileSize * 64;  // 2048 x 2048 arena
 
 function main() {
   PIXI.loader
@@ -70,7 +71,7 @@ function setup() {
 
   renderInitialTiles()
 
-  player = new PIXI.Sprite(PIXI.utils.TextureCache["explorer.png"]);
+  player = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
   player.vx = 0;
   player.vy = 0;
   player.anchor.set(0.5);
@@ -122,10 +123,10 @@ function setup() {
   gameLoop()
 };
 
-var i = 0;
+var gameTick = 0;
 
 function gameLoop() {
-  i++;
+  gameTick++;
   centreViewportOnPlayer();
   requestAnimationFrame(gameLoop);
   state();
@@ -136,7 +137,7 @@ function play() {
   player.x += player.vx;
   player.y += player.vy;
 
-  if (i % 60 == 0) {
+  if (gameTick % 60 == 0) {
     socket.emit('game', {name: window.location.hash});
   }
 }
@@ -149,15 +150,15 @@ function centreViewportOnPlayer() {
 }
 
 function renderInitialTiles() {
-  var topLeftTileTexture = PIXI.utils.TextureCache["top_left_tile.png"];
-  var topTileTexture = PIXI.utils.TextureCache["top_tile.png"];
-  var topRightTileTexture = PIXI.utils.TextureCache["top_right_tile.png"];
-  var leftTileTexture = PIXI.utils.TextureCache["left_tile.png"];
-  var rightTileTexture = PIXI.utils.TextureCache["right_tile.png"];
-  var bottomLeftTileTexture = PIXI.utils.TextureCache["bottom_left_tile.png"];
-  var bottomRightTileTexture = PIXI.utils.TextureCache["bottom_right_tile.png"];
-  var bottomTileTexture = PIXI.utils.TextureCache["bottom_tile.png"];
-  var standardTileTexture = PIXI.utils.TextureCache["standard_tile.png"];
+  var topLeftTileTexture = PIXI.utils.TextureCache["Top Left Tile"];
+  var topTileTexture = PIXI.utils.TextureCache["Top Tile"];
+  var topRightTileTexture = PIXI.utils.TextureCache["Top Right Tile"];
+  var leftTileTexture = PIXI.utils.TextureCache["Left Tile"];
+  var rightTileTexture = PIXI.utils.TextureCache["Right Tile"];
+  var bottomLeftTileTexture = PIXI.utils.TextureCache["Bottom Left Tile"];
+  var bottomRightTileTexture = PIXI.utils.TextureCache["Bottom Right Tile"];
+  var bottomTileTexture = PIXI.utils.TextureCache["Bottom Tile"];
+  var standardTileTexture = PIXI.utils.TextureCache["Standard Tile"];
   var tile =  null
 
   for(var x = 0; x < mapSize; x+= tileSize) {
@@ -188,6 +189,11 @@ function renderInitialTiles() {
       app.stage.addChild(tile);
     }
   }
+}
+
+
+function getSpriteNameAt(x,y) {
+  return app.stage.getChildAt(x,y).texture.textureCacheIds[0]
 }
 
 document.addEventListener("DOMContentLoaded", main)

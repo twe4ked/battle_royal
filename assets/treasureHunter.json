@@ -1,5 +1,5 @@
 {"frames": {
-  "explorer.png":
+  "Player":
   {
     "frame": {"x":2,"y":2,"w":21,"h":32},
     "rotated": false,
@@ -8,16 +8,7 @@
     "sourceSize": {"w":21,"h":32},
     "pivot": {"x":0.5,"y":0.5}
   },
-  "dungeon.png":
-  {
-    "frame": {"x":2,"y":36,"w":512,"h":512},
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": {"x":0,"y":0,"w":512,"h":512},
-    "sourceSize": {"w":512,"h":512},
-    "pivot": {"x":0.5,"y":0.5}
-  },
-  "standard_tile.png":
+  "Standard Tile":
   {
     "frame": {"x":34,"y":68,"w":32,"h":32},
     "rotated": false,
@@ -26,7 +17,7 @@
     "sourceSize": {"w":32,"h":32},
     "pivot": {"x":0.5,"y":0.5}
   },
-  "top_tile.png":
+  "Top Tile":
   {
     "frame": {"x":34,"y":36,"w":32,"h":32},
     "rotated": false,
@@ -35,7 +26,7 @@
     "sourceSize": {"w":32,"h":32},
     "pivot": {"x":0.5,"y":0.5}
   },
-  "bottom_tile.png":
+  "Bottom Tile":
   {
     "frame": {"x":66,"y":518,"w":32,"h":32},
     "rotated": false,
@@ -44,7 +35,7 @@
     "sourceSize": {"w":32,"h":32},
     "pivot": {"x":0.5,"y":0.5}
   },
-  "bottom_left_tile.png":
+  "Bottom Left Tile":
   {
     "frame": {"x":2,"y":518,"w":32,"h":32},
     "rotated": false,
@@ -53,7 +44,7 @@
     "sourceSize": {"w":32,"h":32},
     "pivot": {"x":0.5,"y":0.5}
   },
-  "bottom_right_tile.png":
+  "Bottom Right Tile":
   {
     "frame": {"x":482,"y":518,"w":32,"h":32},
     "rotated": false,
@@ -62,7 +53,7 @@
     "sourceSize": {"w":32,"h":32},
     "pivot": {"x":0.5,"y":0.5}
   },
-  "left_tile.png":
+  "Left Tile":
   {
     "frame": {"x":2,"y":68,"w":32,"h":32},
     "rotated": false,
@@ -71,7 +62,7 @@
     "sourceSize": {"w":32,"h":32},
     "pivot": {"x":0.5,"y":0.5}
   },
-  "right_tile.png":
+  "Right Tile":
   {
     "frame": {"x":482,"y":68,"w":32,"h":32},
     "rotated": false,
@@ -81,7 +72,7 @@
     "pivot": {"x":0.5,"y":0.5}
   },
 
-  "top_right_tile.png":
+  "Top Right Tile":
   {
     "frame": {"x":482,"y":36,"w":32,"h":32},
     "rotated": false,
@@ -90,14 +81,15 @@
     "sourceSize": {"w":32,"h":32},
     "pivot": {"x":0.5,"y":0.5}
   },
-  "top_left_tile.png":
+  "Top Left Tile":
   {
     "frame": {"x":2,"y":36,"w":32,"h":32},
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
     "sourceSize": {"w":32,"h":32},
-    "pivot": {"x":0.5,"y":0.5}
+    "pivot": {"x":0.5,"y":0.5},
+    "accessibleTitle": "Top Left Tile"
   }},
   "meta": {
     "app": "http://www.codeandweb.com/texturepacker",
