@@ -122,31 +122,6 @@ function setup() {
     app.renderer.resize(window.innerWidth, window.innerHeight);
   });
 
-  renderInitialTiles()
-
-  player = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
-  player.vx = 0;
-  player.vy = 0;
-  player.anchor.set(0.5);
-
-  player.x = app.renderer.width / 2;
-  player.y = app.renderer.height / 2;
-
-  app.stage.addChild(player);
-}
-
-function setup() {
-  document.body.appendChild(app.view);
-
-  app.renderer.view.style.position = "absolute";
-  app.renderer.view.style.display = "block";
-  app.renderer.autoResize = true;
-  app.renderer.resize(window.innerWidth, window.innerHeight);
-
-  window.addEventListener("optimizedResize", function() {
-    app.renderer.resize(window.innerWidth, window.innerHeight);
-  });
-
   renderInitialTiles();
 
   player = {
