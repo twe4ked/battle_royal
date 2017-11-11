@@ -189,7 +189,7 @@ function setup() {
     width: PIXI.utils.TextureCache["Player"].width,
     height: PIXI.utils.TextureCache["Player"].height,
     direction: {x: 0, y: 0},
-    lastDirection: {x: 0, y: 0}
+    lastDirection: {x: 0, y: 1}
   }
 
   app.stage.addChild(otherPlayerSprites);
