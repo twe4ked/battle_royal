@@ -172,6 +172,65 @@ function setupPlayersRemainingBar() {
   overlayContainer.addChild(bar)
 }
 
+function worldUpdated(msg) {
+  otherPlayerSprites.children = [];
+  lootSprites.children = [];
+
+  world = msg;
+  for (var playerId in world.clients) {
+    var entity = world.clients[playerId];
+
+    if (entity.location) {
+      if (playerId == player.id) {
+        if(player.sprite === undefined) {
+          player.sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
+          player.sprite.anchor.set(0.5);
+          player.sprite.x = entity.location.x;
+          player.sprite.y = entity.location.y;
+
+          currentPlayerContainer.addChild(player.sprite)
+        }
+      } else {
+        sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Blob"]);
+        sprite.anchor.set(0.5);
+        sprite.x = entity.location.x;
+        sprite.y = entity.location.y;
+
+        otherPlayerSprites.addChild(sprite);
+      }
+    }
+  }
+
+  for (var loot of world.loot) {
+    sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Loot"]);
+    sprite.anchor.set(0.5);
+    sprite.x = loot.x;
+    sprite.y = loot.y;
+
+    if (collision(sprite, player)) {
+      socket.emit("gotLoot", {
+        lootId: loot.id
+      });
+    }
+
+    lootSprites.addChild(sprite);
+  }
+
+  updatePlayersRemainingMessage()
+}
+
+function shotsFired(projectile) {
+  if (projectile.owner != player.id) {
+    registerProjectile(projectile)
+  }
+}
+
+function playerHit(msg) {
+  if (msg.playerId == player.id) {
+    reducePlayerHealth();
+  }
+}
+
 function setup() {
   document.body.appendChild(app.view);
 
@@ -201,72 +260,16 @@ function setup() {
     lastDirection: {x: 0, y: 1}
   }
 
-
-
   controls = setupControls();
   setupHealthBar()
   setupPlayersRemainingBar()
 
   socket = io();
   socket.emit("announce", { name: player.id });
-  socket.on("worldUpdated", function(msg) {
-    otherPlayerSprites.children = [];
-    lootSprites.children = [];
 
-    world = msg;
-    for (var playerId in world.clients) {
-      var entity = world.clients[playerId];
-
-      if (entity.location) {
-        if (playerId == player.id) {
-          if(player.sprite === undefined) {
-            player.sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
-            player.sprite.anchor.set(0.5);
-            player.sprite.x = entity.location.x;
-            player.sprite.y = entity.location.y;
-
-            currentPlayerContainer.addChild(player.sprite)
-          }
-        } else {
-          sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Blob"]);
-          sprite.anchor.set(0.5);
-          sprite.x = entity.location.x;
-          sprite.y = entity.location.y;
-
-          otherPlayerSprites.addChild(sprite);
-        }
-      }
-    }
-
-    for (var loot of world.loot) {
-      sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Loot"]);
-      sprite.anchor.set(0.5);
-      sprite.x = loot.x;
-      sprite.y = loot.y;
-
-      if (collision(sprite, player)) {
-        socket.emit("gotLoot", {
-          lootId: loot.id
-        });
-      }
-
-      lootSprites.addChild(sprite);
-    }
-
-    updatePlayersRemainingMessage()
-  });
-
-  socket.on("shotsFired", function(projectile) {
-    if (projectile.owner != player.id) {
-      registerProjectile(projectile)
-    }
-  });
-
-  socket.on("playerHit", function(msg) {
-    if (msg.playerId == player.id) {
-      reducePlayerHealth();
-    }
-  });
+  socket.on("worldUpdated", worldUpdated)
+  socket.on("shotsFired", shotsFired)
+  socket.on("playerHit", playerHit)
 
   state = play;
   gameLoop();
