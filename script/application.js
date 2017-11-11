@@ -10,9 +10,13 @@ var projectileSpeed = 20;
 var world = {};
 var otherPlayerSprites = new PIXI.Container();
 var lootSprites = new PIXI.Container();
+var tileContainer = new PIXI.Container();
+var overlayContainer = new PIXI.Container();
+var fogOfWarContainer = new PIXI.Container();
+var currentPlayerContainer = new PIXI.Container();
+var projectileContainer = new PIXI.Container();
 var healthBar;
 var playersRemainingMessage;
-var overlayContainer;
 var hitboxSize = tileSize / 2;
 var controls;
 var outerFogOfWar;
@@ -180,6 +184,8 @@ function setup() {
     app.renderer.resize(window.innerWidth, window.innerHeight);
   });
 
+
+  setupStage();
   renderInitialTiles();
 
   player = {
@@ -195,13 +201,7 @@ function setup() {
     lastDirection: {x: 0, y: 1}
   }
 
-  app.stage.addChild(otherPlayerSprites);
-  app.stage.addChild(lootSprites);
 
-  overlayContainer = new PIXI.Container();
-  overlayContainer.width = window.innerWidth;
-  overlayContainer.height = window.innerHeight;
-  app.stage.addChild(overlayContainer);
 
   controls = setupControls();
   setupHealthBar()
@@ -225,7 +225,7 @@ function setup() {
             player.sprite.x = entity.location.x;
             player.sprite.y = entity.location.y;
 
-            app.stage.addChild(player.sprite);
+            currentPlayerContainer.addChild(player.sprite)
           }
         } else {
           sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Blob"]);
@@ -270,6 +270,19 @@ function setup() {
 
   state = play;
   gameLoop();
+}
+
+function setupStage() {
+  overlayContainer.width = window.innerWidth;
+  overlayContainer.height = window.innerHeight;
+
+  app.stage.addChild(tileContainer);
+  app.stage.addChild(otherPlayerSprites);
+  app.stage.addChild(lootSprites);
+  app.stage.addChild(currentPlayerContainer);
+  app.stage.addChild(projectileContainer);
+  app.stage.addChild(fogOfWarContainer);
+  app.stage.addChild(overlayContainer);
 }
 
 function gameLoop() {
@@ -320,7 +333,7 @@ function play() {
           innerFogOfWar.endFill();
           innerFogOfWar.x = player.x;
           innerFogOfWar.y = player.y;
-          app.stage.addChild(innerFogOfWar);
+          fogOfWarContainer.addChild(innerFogOfWar);
 
           outerFogOfWar = new PIXI.Graphics();
           outerFogOfWar.lineStyle(window.innerWidth / 3, 0x000000, 1);
@@ -329,7 +342,7 @@ function play() {
           outerFogOfWar.endFill();
           outerFogOfWar.x = player.x;
           outerFogOfWar.y = player.y;
-          app.stage.addChild(outerFogOfWar);
+          fogOfWarContainer.addChild(outerFogOfWar);
 
         } else {
           innerFogOfWar.x = player.x;
@@ -405,7 +418,8 @@ function renderInitialTiles() {
 
       tile.x = x;
       tile.y = y;
-      app.stage.addChild(tile);
+
+      tileContainer.addChild(tile);
     }
   }
 }
@@ -420,7 +434,7 @@ function registerProjectile({x, y, vx, vy, owner}) {
 
   sprite.anchor.set(0.5);
 
-  app.stage.addChild(sprite)
+  projectileContainer.addChild(sprite)
   projectiles.push(sprite)
 }
 
@@ -488,7 +502,7 @@ function isClippableAt(x, y) {
   // all of the sprites in a single array so we need to mutliple the y value by
   // the offset of a row
   calculatedIndex = Math.floor(x / tileSize) + (Math.floor(y / tileSize) * (mapSize / tileSize));
-  spriteName = app.stage.getChildAt(calculatedIndex).texture.textureCacheIds[0];
+  spriteName = tileContainer.getChildAt(calculatedIndex).texture.textureCacheIds[0];
 
   return clippableSprites.indexOf(spriteName) !== -1;
 }
