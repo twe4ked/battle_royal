@@ -440,7 +440,19 @@ function reducePlayerHealth() {
 
 function playerDead() {
   healthBar.message.text = " ☠️ ";
+  deathScreen();
   socket.emit("playerDead", { playerId: player.id });
+}
+
+function deathScreen() {
+  message = new PIXI.Text(
+    "YOU DED\n" + "BETTER LUCK NEXT TIME!",
+    {fontSize: "64px", fontFamily: "Comic Sans MS", fill: "white"}
+  );
+
+  message.x = 120;
+  message.y = (app.screen.height - 180);
+  overlayContainer.addChild(message);
 }
 
 function isClippableAt(x, y) {
