@@ -15,6 +15,7 @@ var throttle = function(type, name, obj) {
 throttle("resize", "optimizedResize");
 
 var app;
+
 function main() {
   app = new PIXI.Application(800, 600, {backgroundColor : 0x000000});
   document.body.appendChild(app.view);
@@ -24,7 +25,14 @@ function main() {
   app.renderer.autoResize = true;
   app.renderer.resize(window.innerWidth, window.innerHeight);
 
+  PIXI.loader
+    .add("assets/treasureHunter.json")
+    .load(renderInitialTiles);
+
+  console.log(app.stage);
+
   window.addEventListener("optimizedResize", function() {
+    console.log('window is being resized');;
     app.renderer.resize(window.innerWidth, window.innerHeight);
   });
 
@@ -40,6 +48,13 @@ function gameLoop() {
 
 function play() {
   // TODO
+}
+
+function renderInitialTiles() {
+  console.log('done loading')
+  var dungeonTexture = PIXI.utils.TextureCache["dungeon.png"];
+  var dungeon = new PIXI.Sprite(dungeonTexture);
+  app.stage.addChild(dungeon);
 }
 
 document.addEventListener("DOMContentLoaded", main)
