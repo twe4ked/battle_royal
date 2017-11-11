@@ -27,6 +27,10 @@ io.on("connection", function(socket) {
   socket.on("moved", function(locationMsg) {
     player = clients[locationMsg.id];
 
+    if (!player) {
+      return;
+    }
+
     player.location = {
       x: locationMsg.x,
       y: locationMsg.y

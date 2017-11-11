@@ -60,6 +60,8 @@ function main() {
 }
 
 var player;
+var world;
+var playerSprites = new PIXI.Container();
 function setup() {
   document.body.appendChild(app.view);
 
@@ -83,7 +85,8 @@ function setup() {
   player.x = app.renderer.width / 2;
   player.y = app.renderer.height / 2;
 
-  app.stage.addChild(player);
+  app.stage.addChild(playerSprites);
+  playerSprites.addChild(player);
 
   var leftKey = keyboard(37),
     upKey = keyboard(38),
@@ -126,8 +129,21 @@ function setup() {
   socket = io();
   socket.emit("announce", { name: player.id });
   socket.on("world_updated", function(msg) {
-    console.log("WORLD UPDATE!");
-    console.log(msg);
+    playerSprites.children = [];
+
+    world = msg;
+    for (var playerId in world) {
+      var entity = world[playerId];
+
+      if (entity.location) {
+        sprite = new PIXI.Sprite(PIXI.utils.TextureCache["explorer.png"]);
+        sprite.anchor.set(0.5);
+        sprite.x = entity.location.x;
+        sprite.y = entity.location.y;
+
+        playerSprites.addChild(sprite);
+      }
+    }
   });
 
   state = play;
