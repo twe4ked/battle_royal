@@ -14,15 +14,18 @@ var throttle = function(type, name, obj) {
 
 throttle("resize", "optimizedResize");
 
+
+var app = new PIXI.Application(mapSize, mapSize, {backgroundColor : 0x000000});
+var tileSize = 32;
+var mapSize = tileSize * 64;  // 2048 x 2048 arena
+
 function main() {
   PIXI.loader
     .add("assets/treasureHunter.json")
     .load(setup);
 }
 
-var app;
 function setup() {
-  app = new PIXI.Application(800, 600, {backgroundColor : 0x000000});
   document.body.appendChild(app.view);
 
   app.renderer.view.style.position = "absolute";
@@ -31,14 +34,10 @@ function setup() {
   app.renderer.resize(window.innerWidth, window.innerHeight);
 
   window.addEventListener("optimizedResize", function() {
-    console.log('window is being resized');;
     app.renderer.resize(window.innerWidth, window.innerHeight);
   });
 
-  var dungeonTexture = PIXI.utils.TextureCache["dungeon.png"];
-  var dungeon = new PIXI.Sprite(dungeonTexture);
-  app.stage.addChild(dungeon);
-
+  renderInitialTiles()
   state = play;
   gameLoop()
 };
@@ -51,6 +50,48 @@ function gameLoop() {
 
 function play() {
   // TODO
+}
+
+function renderInitialTiles() {
+  var topLeftTileTexture = PIXI.utils.TextureCache["top_left_tile.png"];
+  var topTileTexture = PIXI.utils.TextureCache["top_tile.png"];
+  var topRightTileTexture = PIXI.utils.TextureCache["top_right_tile.png"];
+  var leftTileTexture = PIXI.utils.TextureCache["left_tile.png"];
+  var rightTileTexture = PIXI.utils.TextureCache["right_tile.png"];
+  var bottomLeftTileTexture = PIXI.utils.TextureCache["bottom_left_tile.png"];
+  var bottomRightTileTexture = PIXI.utils.TextureCache["bottom_right_tile.png"];
+  var bottomTileTexture = PIXI.utils.TextureCache["bottom_tile.png"];
+  var standardTileTexture = PIXI.utils.TextureCache["standard_tile.png"];
+  var tile =  null
+
+  for(var x = 0; x < mapSize; x+= tileSize) {
+    for(var y = 0; y < mapSize; y+= tileSize) {
+
+      if (x == 0 && y == 0) {
+        var tile = new PIXI.Sprite(topLeftTileTexture);
+      } else if (y == 0 && x + tileSize >= mapSize) {
+        var tile = new PIXI.Sprite(topRightTileTexture);
+      } else if (y == 0) {
+        var tile = new PIXI.Sprite(topTileTexture);
+      } else if ((y + tileSize >= mapSize) && (x + tileSize >= mapSize)) {
+        var tile = new PIXI.Sprite(bottomRightTileTexture);
+      } else if (x + tileSize >= mapSize) {
+        var tile = new PIXI.Sprite(rightTileTexture);
+      } else if (x == 0 && y + tileSize >= mapSize) {
+        var tile = new PIXI.Sprite(bottomLeftTileTexture);
+      } else if (y + tileSize >= mapSize) {
+        var tile = new PIXI.Sprite(bottomTileTexture);
+      } else if (x == 0) {
+        var tile = new PIXI.Sprite(leftTileTexture);
+      } else {
+        var tile = new PIXI.Sprite(standardTileTexture);
+      }
+
+      tile.x = x
+      tile.y = y
+      app.stage.addChild(tile);
+    }
+  }
 }
 
 document.addEventListener("DOMContentLoaded", main)

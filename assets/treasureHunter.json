@@ -7,6 +7,88 @@
     "spriteSourceSize": {"x":0,"y":0,"w":512,"h":512},
     "sourceSize": {"w":512,"h":512},
     "pivot": {"x":0.5,"y":0.5}
+  },
+  "standard_tile.png":
+  {
+    "frame": {"x":34,"y":68,"w":32,"h":32},
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+    "sourceSize": {"w":32,"h":32},
+    "pivot": {"x":0.5,"y":0.5}
+  },
+  "top_tile.png":
+  {
+    "frame": {"x":34,"y":36,"w":32,"h":32},
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+    "sourceSize": {"w":32,"h":32},
+    "pivot": {"x":0.5,"y":0.5}
+  },
+  "bottom_tile.png":
+  {
+    "frame": {"x":66,"y":518,"w":32,"h":32},
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+    "sourceSize": {"w":32,"h":32},
+    "pivot": {"x":0.5,"y":0.5}
+  },
+  "bottom_left_tile.png":
+  {
+    "frame": {"x":2,"y":518,"w":32,"h":32},
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+    "sourceSize": {"w":32,"h":32},
+    "pivot": {"x":0.5,"y":0.5}
+  },
+  "bottom_right_tile.png":
+  {
+    "frame": {"x":482,"y":518,"w":32,"h":32},
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+    "sourceSize": {"w":32,"h":32},
+    "pivot": {"x":0.5,"y":0.5}
+  },
+  "left_tile.png":
+  {
+    "frame": {"x":2,"y":68,"w":32,"h":32},
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+    "sourceSize": {"w":32,"h":32},
+    "pivot": {"x":0.5,"y":0.5}
+  },
+  "right_tile.png":
+  {
+    "frame": {"x":482,"y":68,"w":32,"h":32},
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+    "sourceSize": {"w":32,"h":32},
+    "pivot": {"x":0.5,"y":0.5}
+  },
+
+  "top_right_tile.png":
+  {
+    "frame": {"x":482,"y":36,"w":32,"h":32},
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+    "sourceSize": {"w":32,"h":32},
+    "pivot": {"x":0.5,"y":0.5}
+  },
+  "top_left_tile.png":
+  {
+    "frame": {"x":2,"y":36,"w":32,"h":32},
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+    "sourceSize": {"w":32,"h":32},
+    "pivot": {"x":0.5,"y":0.5}
   }},
   "meta": {
     "app": "http://www.codeandweb.com/texturepacker",
