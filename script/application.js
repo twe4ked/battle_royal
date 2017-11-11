@@ -86,8 +86,10 @@ function setup() {
     rightKey = keyboard(39),
     downKey = keyboard(40);
 
+  pi = 3.14159
   leftKey.press = function() {
     player.vx = -5;
+    player.rotation = pi / 2 + pi
   };
   leftKey.release = function() {
     player.vx = 0;
@@ -95,6 +97,7 @@ function setup() {
 
   upKey.press = function() {
     player.vy = -5;
+    player.rotation = pi * 2
   };
   upKey.release = function() {
     player.vy = 0;
@@ -102,6 +105,7 @@ function setup() {
 
   rightKey.press = function() {
     player.vx = 5;
+    player.rotation = pi / 2
   };
   rightKey.release = function() {
     player.vx = 0;
@@ -109,6 +113,7 @@ function setup() {
 
   downKey.press = function() {
     player.vy = 5;
+    player.rotation = pi
   };
   downKey.release = function() {
     player.vy = 0;
