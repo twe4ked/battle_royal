@@ -72,27 +72,20 @@ function setup() {
 
   renderInitialTiles();
 
-  player = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
-  player.id = window.location.hash;
-  player.vx = 0;
-  player.vy = 0;
-  player.anchor.set(0.5);
+  player = {x: 0, y: 0, vx: 0, vy: 0, id: window.location.hash}
 
   player.x = app.renderer.width / 2;
   player.y = app.renderer.height / 2;
 
   app.stage.addChild(playerSprites);
-  playerSprites.addChild(player);
 
   var leftKey = keyboard(37),
     upKey = keyboard(38),
     rightKey = keyboard(39),
     downKey = keyboard(40);
 
-  pi = 3.14159
   leftKey.press = function() {
     player.vx = -5
-    player.rotation = Math.PI / 2 + Math.PI
   };
   leftKey.release = function() {
     player.vx = 0;
@@ -100,7 +93,6 @@ function setup() {
 
   upKey.press = function() {
     player.vy = -5
-    player.rotation = Math.PI * 2
   };
 
   upKey.release = function() {
@@ -109,7 +101,6 @@ function setup() {
 
   rightKey.press = function() {
     player.vx = 5;
-    player.rotation = Math.PI / 2
   };
   rightKey.release = function() {
     player.vx = 0;
@@ -117,7 +108,6 @@ function setup() {
 
   downKey.press = function() {
     player.vy = 5;
-    player.rotation = Math.PI
   };
   downKey.release = function() {
     player.vy = 0;
