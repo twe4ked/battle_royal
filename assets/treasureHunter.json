@@ -1,4 +1,13 @@
 {"frames": {
+  "Blob":
+  {
+    "frame": {"x":55,"y":2,"w":32,"h":24},
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":24},
+    "sourceSize": {"w":32,"h":24},
+    "pivot": {"x":0.5,"y":0.5}
+  },
   "Player":
   {
     "frame": {"x":2,"y":2,"w":21,"h":32},

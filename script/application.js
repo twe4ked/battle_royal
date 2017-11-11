@@ -123,7 +123,11 @@ function setup() {
       var entity = world[playerId];
 
       if (entity.location) {
-        sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
+        if (playerId == player.id) {
+          sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
+        } else {
+          sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Blob"]);
+        }
         sprite.anchor.set(0.5);
         sprite.x = entity.location.x;
         sprite.y = entity.location.y;
