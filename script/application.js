@@ -108,10 +108,13 @@ function setup() {
 
   renderInitialTiles();
 
-  player = {x: 0, y: 0, vx: 0, vy: 0, id: Math.random()}
-
-  player.x = app.renderer.width / 2;
-  player.y = app.renderer.height / 2;
+  player = {
+    x: app.renderer.width / 2,
+    y: app.renderer.height / 2,
+    vx: 0,
+    vy: 0,
+    id: Math.random()
+  }
 
   app.stage.addChild(playerSprites);
 
