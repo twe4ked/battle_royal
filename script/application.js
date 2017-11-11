@@ -47,7 +47,6 @@ function keyboard(keyCode) {
       key.isDown = true;
       key.isUp = false;
     }
-    event.preventDefault();
   };
 
   key.upHandler = function(event) {
@@ -56,7 +55,6 @@ function keyboard(keyCode) {
       key.isDown = false;
       key.isUp = true;
     }
-    event.preventDefault();
   };
 
   window.addEventListener("keydown", key.downHandler.bind(key), false);
