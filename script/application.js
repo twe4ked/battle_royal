@@ -35,41 +35,37 @@ var throttle = function(type, name, obj) {
 
 throttle("resize", "optimizedResize");
 
-function keyboard(keyCode) {
-  var key = {};
-  key.code = keyCode;
-  key.isDown = false;
-  key.isUp = true;
-  key.press = undefined;
-  key.release = undefined;
+function setupControls() {
+  var keyboard = function(keyCode) {
+    var key = {};
+    key.code = keyCode;
+    key.isDown = false;
+    key.isUp = true;
+    key.press = undefined;
+    key.release = undefined;
 
-  key.downHandler = function(event) {
-    if (event.keyCode === key.code) {
-      if (key.isUp && key.press) key.press();
-      key.isDown = true;
-      key.isUp = false;
-    }
-  };
+    key.downHandler = function(event) {
+      if (event.keyCode === key.code) {
+        if (key.isUp && key.press) key.press();
+        key.isDown = true;
+        key.isUp = false;
+      }
+    };
 
-  key.upHandler = function(event) {
-    if (event.keyCode === key.code) {
-      if (key.isDown && key.release) key.release();
-      key.isDown = false;
-      key.isUp = true;
-    }
-  };
+    key.upHandler = function(event) {
+      if (event.keyCode === key.code) {
+        if (key.isDown && key.release) key.release();
+        key.isDown = false;
+        key.isUp = true;
+      }
+    };
 
-  window.addEventListener("keydown", key.downHandler.bind(key), false);
-  window.addEventListener("keyup", key.upHandler.bind(key), false);
-  return key;
-}
+    window.addEventListener("keydown", key.downHandler.bind(key), false);
+    window.addEventListener("keyup", key.upHandler.bind(key), false);
+    return key;
+  }
 
-function main() {
-  PIXI.loader.add("assets/treasureHunter.json").load(setup);
-}
-
-function setupKeyHandling() {
-  controls = {
+  var controls = {
     leftKey: keyboard(37),
     upKey: keyboard(38),
     rightKey: keyboard(39),
@@ -83,18 +79,11 @@ function setupKeyHandling() {
 
   controls.spaceKey.press = tryShoot;
 
-  controls.aKey.press = controls.leftKey.press = function() {
-    playerLastDirection = 'left';
-  }
-  controls.wKey.press = controls.upKey.press = function() {
-    playerLastDirection = 'up';
-  };
-  controls.dKey.press = controls.rightKey.press = function() {
-    playerLastDirection = 'right';
-  };
-  controls.sKey.press = controls.downKey.press = function() {
-    playerLastDirection = 'down';
-  };
+  return controls;
+}
+
+function main() {
+  PIXI.loader.add("assets/treasureHunter.json").load(setup);
 }
 
 function calculatePlayerVelocity() {
@@ -110,8 +99,11 @@ function calculatePlayerVelocity() {
 
   if (mag > 0) {
     player.direction = {x: directionVector.x / mag, y: directionVector.y / mag}
+    player.lastDirection = player.direction
+    player.moving = true
   } else {
     player.direction = {x: 0, y: 0}
+    player.moving = false
   }
 
   player.vx = playerMovementSpeed * player.direction.x
@@ -209,7 +201,7 @@ function setup() {
   overlayContainer.height = window.innerHeight;
   app.stage.addChild(overlayContainer);
 
-  setupKeyHandling();
+  controls = setupControls();
   setupHealthBar()
   setupPlayersRemainingBar()
 
@@ -401,17 +393,10 @@ function registerProjectile({x, y, vx, vy, owner}) {
 
 function calculateProjectileFromPlayer() {
   var projectile = {vx: 0, vy: 0}
+  var direction = player.moving ? player.direction : player.lastDirection
 
-  if (playerLastDirection == 'up') {
-    projectile.vy = -projectileSpeed;
-  } else if (playerLastDirection == 'down') {
-    projectile.vy = projectileSpeed;
-  } else if (playerLastDirection == 'left') {
-    projectile.vx = -projectileSpeed;
-  } else if (playerLastDirection == 'right') {
-    projectile.vx = projectileSpeed;
-  }
-
+  projectile.vx = direction.x * projectileSpeed
+  projectile.vy = direction.y * projectileSpeed
   projectile.x = player.x
   projectile.y = player.y
   projectile.owner = player.id
