@@ -30,8 +30,6 @@ function setup() {
   app.renderer.autoResize = true;
   app.renderer.resize(window.innerWidth, window.innerHeight);
 
-  console.log(app.stage);
-
   window.addEventListener("optimizedResize", function() {
     console.log('window is being resized');;
     app.renderer.resize(window.innerWidth, window.innerHeight);
