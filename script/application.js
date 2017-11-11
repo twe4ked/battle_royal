@@ -1,12 +1,13 @@
-var app = new PIXI.Application(mapSize, mapSize, { backgroundColor: 0xfacade });
-var tileSize = 32;
-var mapSize = tileSize * 64;  // 2048 x 2048 arena
+const PLAYER_MOVEMENT_SPEED = 5;
+const PROJECTILE_SPEED = 20;
+const TILE_SIZE = 32;
+const MAP_SIZE = TILE_SIZE * 64;  // 2048 x 2048 arena
+
+var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0xfacade });
 var gameTick = 0;
 var player;
 var projectiles = [];
 var canShootNext = 0;
-var playerMovementSpeed = 5;
-var projectileSpeed = 20;
 var world = {};
 var otherPlayerSprites = new PIXI.Container();
 var lootSprites = new PIXI.Container();
@@ -17,7 +18,7 @@ var currentPlayerContainer = new PIXI.Container();
 var projectileContainer = new PIXI.Container();
 var healthBar;
 var playersRemainingMessage;
-var hitboxSize = tileSize / 2;
+var hitboxSize = TILE_SIZE / 2;
 var controls;
 var outerFogOfWar;
 var innerFogOfWar;
@@ -109,8 +110,8 @@ function calculatePlayerVelocity() {
     player.direction = {x: 0, y: 0}
   }
 
-  player.vx = playerMovementSpeed * player.direction.x
-  player.vy = playerMovementSpeed * player.direction.y
+  player.vx = PLAYER_MOVEMENT_SPEED * player.direction.x
+  player.vy = PLAYER_MOVEMENT_SPEED * player.direction.y
 }
 
 function setupHealthBar() {
@@ -397,21 +398,21 @@ function renderInitialTiles() {
   var standardTileTexture = PIXI.utils.TextureCache["Standard Tile"];
   var tile = null;
 
-  for (var x = 0; x < mapSize; x += tileSize) {
-    for (var y = 0; y < mapSize; y += tileSize) {
+  for (var x = 0; x < MAP_SIZE; x += TILE_SIZE) {
+    for (var y = 0; y < MAP_SIZE; y += TILE_SIZE) {
       if (x == 0 && y == 0) {
         var tile = new PIXI.Sprite(topLeftTileTexture);
-      } else if (y == 0 && x + tileSize >= mapSize) {
+      } else if (y == 0 && x + TILE_SIZE >= MAP_SIZE) {
         var tile = new PIXI.Sprite(topRightTileTexture);
       } else if (y == 0) {
         var tile = new PIXI.Sprite(topTileTexture);
-      } else if (y + tileSize >= mapSize && x + tileSize >= mapSize) {
+      } else if (y + TILE_SIZE >= MAP_SIZE && x + TILE_SIZE >= MAP_SIZE) {
         var tile = new PIXI.Sprite(bottomRightTileTexture);
-      } else if (x + tileSize >= mapSize) {
+      } else if (x + TILE_SIZE >= MAP_SIZE) {
         var tile = new PIXI.Sprite(rightTileTexture);
-      } else if (x == 0 && y + tileSize >= mapSize) {
+      } else if (x == 0 && y + TILE_SIZE >= MAP_SIZE) {
         var tile = new PIXI.Sprite(bottomLeftTileTexture);
-      } else if (y + tileSize >= mapSize) {
+      } else if (y + TILE_SIZE >= MAP_SIZE) {
         var tile = new PIXI.Sprite(bottomTileTexture);
       } else if (x == 0) {
         var tile = new PIXI.Sprite(leftTileTexture);
@@ -444,8 +445,8 @@ function registerProjectile({x, y, vx, vy, owner}) {
 function calculateProjectileFromPlayer() {
   var projectile = {vx: 0, vy: 0}
 
-  projectile.vx = player.lastDirection.x * projectileSpeed
-  projectile.vy = player.lastDirection.y * projectileSpeed
+  projectile.vx = player.lastDirection.x * PROJECTILE_SPEED
+  projectile.vy = player.lastDirection.y * PROJECTILE_SPEED
   projectile.x = player.x
   projectile.y = player.y
   projectile.owner = player.id
@@ -504,7 +505,7 @@ function isClippableAt(x, y) {
   // calculate the array index from the given x and y values. The stage stores
   // all of the sprites in a single array so we need to mutliple the y value by
   // the offset of a row
-  calculatedIndex = Math.floor(x / tileSize) + (Math.floor(y / tileSize) * (mapSize / tileSize));
+  calculatedIndex = Math.floor(x / TILE_SIZE) + (Math.floor(y / TILE_SIZE) * (MAP_SIZE / TILE_SIZE));
   spriteName = tileContainer.getChildAt(calculatedIndex).texture.textureCacheIds[0];
 
   return clippableSprites.indexOf(spriteName) !== -1;
