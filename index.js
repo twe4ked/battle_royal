@@ -35,14 +35,16 @@ io.on("connection", function(socket) {
       x: locationMsg.x,
       y: locationMsg.y
     };
-
-    io.emit("world_updated", clients);
   });
 
   socket.on("disconnect", function() {
     console.log(`should get rid of somebody..`);
   });
 });
+
+setInterval(function() {
+  io.emit("world_updated", clients);
+}, 1000 / 60);
 
 http.listen(port, function() {
   console.log("listening on *:" + port);
