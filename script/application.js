@@ -113,11 +113,19 @@ function setup() {
     player.vy = 0;
   };
 
+  socket = io();
+  socket.on('game', function(msg) {
+    console.log(msg)
+  });
+
   state = play;
   gameLoop()
 };
 
+var i = 0;
+
 function gameLoop() {
+  i++;
   requestAnimationFrame(gameLoop);
   state();
   app.renderer.render(app.stage);
@@ -126,6 +134,10 @@ function gameLoop() {
 function play() {
   player.x += player.vx;
   player.y += player.vy;
+
+  if (i % 60 == 0) {
+    socket.emit('game', {name: window.location.hash});
+  }
 }
 
 function renderInitialTiles() {
