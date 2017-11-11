@@ -163,7 +163,7 @@ function setup() {
     y: app.renderer.height / 2,
     vx: 0,
     vy: 0,
-    id: Math.random()
+    id: Math.random().toString()
   }
 
   app.stage.addChild(playerSprites);
@@ -211,9 +211,10 @@ function setup() {
     }
   });
 
-  socket.on("shotsFired", function({id, projectile}) {
-    if (id == player.id) { return; }
-    registerProjectile(projectile)
+  socket.on("shotsFired", function(projectile) {
+    if (projectile.owner != player.id) {
+      registerProjectile(projectile)
+    }
   });
 
   socket.on("player_hit", function(msg) {
@@ -238,7 +239,7 @@ function play() {
   // Check if any projectiles have hit another player
   projectiles.forEach(function(projectile) {
     for (var playerId in world.clients) {
-      if (playerId != player.id && Math.abs(projectile.x -
+      if (playerId != projectile.owner && Math.abs(projectile.x -
             world.clients[playerId].location.x) <= hitboxSize &&
           Math.abs(projectile.y - world.clients[playerId].location.y) <=
           hitboxSize) {
@@ -324,12 +325,13 @@ function renderInitialTiles() {
   }
 }
 
-function registerProjectile({x, y, vx, vy}) {
+function registerProjectile({x, y, vx, vy, owner}) {
   var sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Projectile"]);
   sprite.x = x
   sprite.y = y
   sprite.vx = vx
   sprite.vy = vy
+  sprite.owner = owner;
 
   sprite.anchor.set(0.5);
 
@@ -352,19 +354,18 @@ function calculateProjectileFromPlayer() {
 
   projectile.x = player.x
   projectile.y = player.y
+  projectile.owner = player.id
 
   return projectile
 }
 
 function notifyServerOfShotFired(projectile) {
     socket.emit('shotsFired', {
-      id: player.id,
-      projectile: {
-        x: projectile.x,
-        y: projectile.y,
-        vx: projectile.vx,
-        vy: projectile.vy
-      }
+      x: projectile.x,
+      y: projectile.y,
+      vx: projectile.vx,
+      vy: projectile.vy,
+      owner: player.id
     })
 }
 
