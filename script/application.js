@@ -465,6 +465,7 @@ function reducePlayerHealth() {
 
 function playerDead() {
   healthBar.message.text = " ☠️ ";
+  player.sprite.alpha = 0.4; // you're a ghost now!
   showDeathScreen();
   socket.emit("playerDead", { playerId: player.id });
 }
