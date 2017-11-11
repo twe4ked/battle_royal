@@ -62,9 +62,12 @@ io.on("connection", function(socket) {
 });
 
 setInterval(function() {
+  let playersRemainingCount = _.filter(clients, (client) => (client.alive)).length
+
   io.emit("world_updated", {
-    clients: clients,
-    loot: loot
+    clients,
+    loot,
+    playersRemainingCount,
   });
 }, 1000 / 60);
 

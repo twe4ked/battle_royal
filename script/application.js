@@ -7,11 +7,12 @@ var projectiles = [];
 var canShootNext = 0;
 var playerMovementSpeed = 5;
 var projectileSpeed = 20;
-var world;
+var world = {};
 var playerSprites = new PIXI.Container();
 var lootSprites = new PIXI.Container();
 var playerLastDirection = 'down';
 var healthBar;
+var playersRemainingMessage;
 var overlayContainer;
 var hitboxSize = tileSize / 2;
 
@@ -143,6 +144,33 @@ function setupHealthBar() {
   overlayContainer.addChild(healthBar);
 }
 
+function updatePlayersRemainingMessage() {
+  if (!world.playersRemainingCount) { return; }
+
+  playersRemainingMessage.text = `Players Remaining: ${world.playersRemainingCount}`
+}
+
+function setupPlayersRemainingBar() {
+  var bar = new PIXI.Container();
+  bar.position.set(300, 10)
+
+  var innerBar = new PIXI.Graphics();
+  innerBar.beginFill(0x000000);
+  innerBar.drawRect(0, 0, 130, 22);
+  innerBar.endFill();
+  bar.addChild(innerBar);
+
+  playersRemainingMessage = new PIXI.Text(
+    "",
+    {fontFamily: "Futura", fontSize: "13px", fill: "white" }
+  );
+
+  updatePlayersRemainingMessage()
+
+  innerBar.addChild(playersRemainingMessage)
+  overlayContainer.addChild(bar)
+}
+
 function setup() {
   document.body.appendChild(app.view);
 
@@ -175,6 +203,7 @@ function setup() {
 
   setupKeyHandling();
   setupHealthBar()
+  setupPlayersRemainingBar()
 
   socket = io();
   socket.emit("announce", { name: player.id });
@@ -208,6 +237,8 @@ function setup() {
 
       lootSprites.addChild(sprite);
     }
+
+    updatePlayersRemainingMessage()
   });
 
   socket.on("shotsFired", function(projectile) {
