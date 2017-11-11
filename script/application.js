@@ -13,6 +13,7 @@ var lootSprites = new PIXI.Container();
 var playerLastDirection = 'down';
 var healthBar;
 var overlayContainer;
+var hitboxSize = tileSize / 2;
 
 var throttle = function(type, name, obj) {
   obj = obj || window;
@@ -213,7 +214,13 @@ function setup() {
   socket.on("shotsFired", function({id, projectile}) {
     if (id == player.id) { return; }
     registerProjectile(projectile)
-  })
+  });
+
+  socket.on("player_hit", function(msg) {
+    if (msg.playerId == player.id) {
+      reducePlayerHealth();
+    }
+  });
 
   state = play;
   gameLoop();
@@ -228,6 +235,21 @@ function gameLoop() {
 }
 
 function play() {
+  // Check if any projectiles have hit another player
+  projectiles.forEach(function(projectile) {
+    for (var playerId in world.clients) {
+      if (playerId != player.id && Math.abs(projectile.x -
+            world.clients[playerId].location.x) <= hitboxSize &&
+          Math.abs(projectile.y - world.clients[playerId].location.y) <=
+          hitboxSize) {
+        socket.emit("player_hit", { playerId: playerId });
+        projectile.vx = 0;
+        projectile.vy = 0;
+        projectile.parent.removeChild(projectile)
+      }
+    }
+  })
+
   if (isClippableAt(player.x + player.vx, player.y + player.vy)) {
     player.x += player.vx;
     player.y += player.vy;

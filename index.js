@@ -32,10 +32,15 @@ io.on("connection", function(socket) {
     };
   });
 
+
   socket.on("shotsFired", function(payload) {
     console.log("Shot fired!", payload)
     io.emit("shotsFired", payload)
-  })
+  });
+
+  socket.on("player_hit", function(hitMsg) {
+    io.emit("player_hit", hitMsg);
+  });
 
   socket.on("disconnect", function() {
     console.log(`Disconnecting ${socket.id}`)
