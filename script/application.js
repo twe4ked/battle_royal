@@ -126,6 +126,7 @@ var i = 0;
 
 function gameLoop() {
   i++;
+  centreViewportOnPlayer();
   requestAnimationFrame(gameLoop);
   state();
   app.renderer.render(app.stage);
@@ -138,6 +139,13 @@ function play() {
   if (i % 60 == 0) {
     socket.emit('game', {name: window.location.hash});
   }
+}
+
+function centreViewportOnPlayer() {
+  var newX = (app.renderer.screen.width / 2) - player.x
+  var newY = (app.renderer.screen.height / 2) - player.y
+
+  app.stage.setTransform(newX, newY)
 }
 
 function renderInitialTiles() {
