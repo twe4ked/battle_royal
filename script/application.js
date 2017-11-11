@@ -11,6 +11,8 @@ var world;
 var playerSprites = new PIXI.Container();
 var lootSprites = new PIXI.Container();
 var playerLastDirection = 'down';
+var healthBar;
+var overlayContainer;
 
 var throttle = function(type, name, obj) {
   obj = obj || window;
@@ -110,6 +112,37 @@ function setupKeyHandling() {
   };
 }
 
+function setupHealthBar() {
+  //Create the health bar
+  healthBar = new PIXI.Container();
+  healthBar.position.set(10, 10)
+
+  //Create the black background rectangle
+  var innerBar = new PIXI.Graphics();
+  innerBar.beginFill(0x000000);
+  innerBar.drawRect(0, 0, 130, 22);
+  innerBar.endFill();
+  healthBar.addChild(innerBar);
+
+  //Create the front red rectangle
+  var outerBar = new PIXI.Graphics();
+  outerBar.beginFill(0xFF3300);
+  outerBar.drawRect(1, 1, 128, 20);
+  outerBar.endFill();
+  healthBar.addChild(outerBar);
+  message = new PIXI.Text(
+    "Health",
+    {fontFamily: "Futura", fontSize: "13px", fill: "white" }
+  );
+  message.x = 48;
+  message.y = 2;
+
+  healthBar.outer = outerBar;
+
+  healthBar.addChild(message);
+  overlayContainer.addChild(healthBar);
+}
+
 function setup() {
   document.body.appendChild(app.view);
 
@@ -135,7 +168,13 @@ function setup() {
   app.stage.addChild(playerSprites);
   app.stage.addChild(lootSprites);
 
+  overlayContainer = new PIXI.Container();
+  overlayContainer.width = window.innerWidth;
+  overlayContainer.height = window.innerHeight;
+  app.stage.addChild(overlayContainer);
+
   setupKeyHandling();
+  setupHealthBar()
 
   socket = io();
   socket.emit("announce", { name: player.id });
@@ -214,6 +253,7 @@ function centreViewportOnPlayer() {
   var newY = app.renderer.screen.height / 2 - player.y;
 
   app.stage.setTransform(newX, newY);
+  overlayContainer.setTransform(player.x - app.renderer.screen.width / 2, player.y - app.renderer.screen.height / 2)
 }
 
 function renderInitialTiles() {
@@ -282,6 +322,17 @@ function tryShoot() {
 
     canShootNext = gameTick + 30;
   }
+}
+
+function reducePlayerHealth() {
+  healthBar.outer.width -= 32;
+  if (healthBar.outer.width == 0) {
+    playerDead();
+  }
+}
+
+function playerDead() {
+  console.log('You have died')
 }
 
 function isClippableAt(x, y) {
