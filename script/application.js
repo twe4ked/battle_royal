@@ -98,7 +98,7 @@ function calculatePlayerVelocity() {
   if (controls.dKey.isDown || controls.rightKey.isDown) { directionVector.x += 1 }
   if (controls.wKey.isDown || controls.upKey.isDown) { directionVector.y -= 1 }
   if (controls.sKey.isDown || controls.downKey.isDown) { directionVector.y += 1 }
-  
+
   var squaredTerms = directionVector.x * directionVector.x + directionVector.y * directionVector.y
   var mag = Math.sqrt(squaredTerms)
 
