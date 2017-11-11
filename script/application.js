@@ -15,6 +15,7 @@ var healthBar;
 var playersRemainingMessage;
 var overlayContainer;
 var hitboxSize = tileSize / 2;
+var controls;
 
 var throttle = function(type, name, obj) {
   obj = obj || window;
@@ -67,30 +68,31 @@ function main() {
   PIXI.loader.add("assets/treasureHunter.json").load(setup);
 }
 
-var
-  leftKey = keyboard(37),
-  upKey = keyboard(38),
-  rightKey = keyboard(39),
-  downKey = keyboard(40),
-  spaceKey = keyboard(32),
-  aKey = keyboard(65),
-  wKey = keyboard(87),
-  dKey = keyboard(68),
-  sKey = keyboard(83);
-
 function setupKeyHandling() {
-  spaceKey.press = tryShoot;
+  controls = {
+    leftKey: keyboard(37),
+    upKey: keyboard(38),
+    rightKey: keyboard(39),
+    downKey: keyboard(40),
+    spaceKey: keyboard(32),
+    aKey: keyboard(65),
+    wKey: keyboard(87),
+    dKey: keyboard(68),
+    sKey: keyboard(83)
+  }
 
-  aKey.press = leftKey.press = function() {
+  controls.spaceKey.press = tryShoot;
+
+  controls.aKey.press = controls.leftKey.press = function() {
     playerLastDirection = 'left';
   }
-  wKey.press = upKey.press = function() {
+  controls.wKey.press = controls.upKey.press = function() {
     playerLastDirection = 'up';
   };
-  dKey.press = rightKey.press = function() {
+  controls.dKey.press = controls.rightKey.press = function() {
     playerLastDirection = 'right';
   };
-  sKey.press = downKey.press = function() {
+  controls.sKey.press = controls.downKey.press = function() {
     playerLastDirection = 'down';
   };
 }
@@ -98,10 +100,10 @@ function setupKeyHandling() {
 function calculatePlayerVelocity() {
   var directionVector = {x: 0, y: 0}
 
-  if (aKey.isDown || leftKey.isDown) { directionVector.x -= 1 }
-  if (dKey.isDown || rightKey.isDown) { directionVector.x += 1 }
-  if (wKey.isDown || upKey.isDown) { directionVector.y -= 1 }
-  if (sKey.isDown || downKey.isDown) { directionVector.y += 1 }
+  if (controls.aKey.isDown || controls.leftKey.isDown) { directionVector.x -= 1 }
+  if (controls.dKey.isDown || controls.rightKey.isDown) { directionVector.x += 1 }
+  if (controls.wKey.isDown || controls.upKey.isDown) { directionVector.y -= 1 }
+  if (controls.sKey.isDown || controls.downKey.isDown) { directionVector.y += 1 }
   
   var squaredTerms = directionVector.x * directionVector.x + directionVector.y * directionVector.y
   var mag = Math.sqrt(squaredTerms)
