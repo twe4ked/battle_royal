@@ -40,7 +40,7 @@ io.on("connection", function(socket) {
   });
 
   socket.on("disconnect", function() {
-    console.log(`should get rid of ${player.name}`);
+    console.log(`should get rid of somebody..`);
   });
 });
 
