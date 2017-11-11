@@ -513,16 +513,15 @@ function showDeathScreen() {
 }
 
 function isClippableAt(x, y) {
-  clippableSprites = ["Standard Tile"];
+  tileBounds = tileContainer.getBounds();
+  clippableBounds = new PIXI.Rectangle(
+    TILE_SIZE * 1.25,
+    TILE_SIZE * 0.75,
+    tileBounds.width - (2.5 * TILE_SIZE),
+    tileBounds.height - (2.25 * TILE_SIZE)
+  )
 
-  // the getChildAt simply gets the sprite at the array Index we give, we can
-  // calculate the array index from the given x and y values. The stage stores
-  // all of the sprites in a single array so we need to mutliple the y value by
-  // the offset of a row
-  calculatedIndex = Math.floor(x / TILE_SIZE) + (Math.floor(y / TILE_SIZE) * (MAP_SIZE / TILE_SIZE));
-  spriteName = tileContainer.getChildAt(calculatedIndex).texture.textureCacheIds[0];
-
-  return clippableSprites.indexOf(spriteName) !== -1;
+  return clippableBounds.contains(x, y);
 }
 
 function collision(r1, r2) {
