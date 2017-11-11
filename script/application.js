@@ -67,59 +67,53 @@ function main() {
   PIXI.loader.add("assets/treasureHunter.json").load(setup);
 }
 
-function setupKeyHandling() {
-  var
-    leftKey = keyboard(37),
-    upKey = keyboard(38),
-    rightKey = keyboard(39),
-    downKey = keyboard(40),
-    spaceKey = keyboard(32),
-    aKey = keyboard(65),
-    wKey = keyboard(87),
-    dKey = keyboard(68),
-    sKey = keyboard(83);
+var
+  leftKey = keyboard(37),
+  upKey = keyboard(38),
+  rightKey = keyboard(39),
+  downKey = keyboard(40),
+  spaceKey = keyboard(32),
+  aKey = keyboard(65),
+  wKey = keyboard(87),
+  dKey = keyboard(68),
+  sKey = keyboard(83);
 
+function setupKeyHandling() {
   spaceKey.press = tryShoot;
 
   aKey.press = leftKey.press = function() {
-    player.vx = -playerMovementSpeed;
     playerLastDirection = 'left';
   }
-  aKey.release = leftKey.release = function() {
-    if (player.vx < 0) {
-      player.vx = 0
-    }
-  };
-
   wKey.press = upKey.press = function() {
-    player.vy = -playerMovementSpeed;
     playerLastDirection = 'up';
   };
-  wKey.release = upKey.release = function() {
-    if (player.vy < 0) {
-      player.vy = 0;
-    }
-  };
-
   dKey.press = rightKey.press = function() {
-    player.vx = playerMovementSpeed;
     playerLastDirection = 'right';
   };
-  dKey.release = rightKey.release = function() {
-    if (player.vx > 0) {
-      player.vx = 0;
-    }
-  };
-
   sKey.press = downKey.press = function() {
-    player.vy = playerMovementSpeed;
     playerLastDirection = 'down';
   };
-  sKey.release = downKey.release = function() {
-    if (player.vy > 0) {
-      player.vy = 0;
-    }
-  };
+}
+
+function calculatePlayerVelocity() {
+  var directionVector = {x: 0, y: 0}
+
+  if (aKey.isDown || leftKey.isDown) { directionVector.x -= 1 }
+  if (dKey.isDown || rightKey.isDown) { directionVector.x += 1 }
+  if (wKey.isDown || upKey.isDown) { directionVector.y -= 1 }
+  if (sKey.isDown || downKey.isDown) { directionVector.y += 1 }
+  
+  var squaredTerms = directionVector.x * directionVector.x + directionVector.y * directionVector.y
+  var mag = Math.sqrt(squaredTerms)
+
+  if (mag > 0) {
+    player.direction = {x: directionVector.x / mag, y: directionVector.y / mag}
+  } else {
+    player.direction = {x: 0, y: 0}
+  }
+
+  player.vx = playerMovementSpeed * player.direction.x
+  player.vy = playerMovementSpeed * player.direction.y
 }
 
 function setupHealthBar() {
@@ -291,6 +285,8 @@ function gameLoop() {
 }
 
 function play() {
+  calculatePlayerVelocity()
+
   // Check if any projectiles have hit another player
   projectiles.forEach(function(projectile) {
     for (var playerId in world.clients) {
