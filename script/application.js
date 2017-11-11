@@ -8,7 +8,7 @@ var canShootNext = 0;
 var playerMovementSpeed = 5;
 var projectileSpeed = 20;
 var world = {};
-var playerSprites = new PIXI.Container();
+var otherPlayerSprites = new PIXI.Container();
 var lootSprites = new PIXI.Container();
 var playerLastDirection = 'down';
 var healthBar;
@@ -193,7 +193,7 @@ function setup() {
     id: Math.random().toString()
   }
 
-  app.stage.addChild(playerSprites);
+  app.stage.addChild(otherPlayerSprites);
   app.stage.addChild(lootSprites);
 
   overlayContainer = new PIXI.Container();
@@ -208,7 +208,7 @@ function setup() {
   socket = io();
   socket.emit("announce", { name: player.id });
   socket.on("world_updated", function(msg) {
-    playerSprites.children = [];
+    otherPlayerSprites.children = [];
     lootSprites.children = [];
 
     world = msg;
@@ -217,15 +217,22 @@ function setup() {
 
       if (entity.location) {
         if (playerId == player.id) {
-          sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
+          if(player.sprite === undefined) {
+            player.sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
+            player.sprite.anchor.set(0.5);
+            player.sprite.x = entity.location.x;
+            player.sprite.y = entity.location.y;
+
+            app.stage.addChild(player.sprite);
+          }
         } else {
           sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Blob"]);
-        }
-        sprite.anchor.set(0.5);
-        sprite.x = entity.location.x;
-        sprite.y = entity.location.y;
+          sprite.anchor.set(0.5);
+          sprite.x = entity.location.x;
+          sprite.y = entity.location.y;
 
-        playerSprites.addChild(sprite);
+          otherPlayerSprites.addChild(sprite);
+        }
       }
     }
 
@@ -286,6 +293,11 @@ function play() {
   if (isClippableAt(player.x + player.vx, player.y + player.vy)) {
     player.x += player.vx;
     player.y += player.vy;
+
+    if (player.sprite) {
+      player.sprite.x = player.x;
+      player.sprite.y = player.y;
+    }
   }
 
   socket.emit("moved", { id: player.id, x: player.x, y: player.y });
