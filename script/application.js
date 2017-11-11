@@ -161,8 +161,8 @@ function setup() {
     playerSprites.children = [];
 
     world = msg;
-    for (var playerId in world) {
-      var entity = world[playerId];
+    for (var playerId in world.clients) {
+      var entity = world.clients[playerId];
 
       if (entity.location) {
         if (playerId == player.id) {
