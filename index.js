@@ -4,7 +4,14 @@ var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var port = process.env.PORT || 3000;
 var clients = {};
-var loot = _.times(10, function() { return {x: _.random(0, 2047), y: _.random(0, 2047)} });
+// TODO: `loot` should be a hash with the `id` as the key.
+var loot = _.times(10, function() {
+  return {
+    id: Math.random().toString(),
+    x: _.random(0, 2047),
+    y: _.random(0, 2047),
+  }
+});
 
 app.get("*", function(req, res) {
   if (req.path === "/") {
@@ -36,6 +43,12 @@ io.on("connection", function(socket) {
     console.log("Shot fired!", payload)
     io.emit("shotsFired", payload)
   });
+
+  socket.on("gotLoot", function(payload) {
+    loot = _.reject(loot, function(l) {
+      return l.id === payload.lootId
+    })
+  })
 
   socket.on("player_hit", function(msg) {
     clients[msg.playerId].health -= 1;

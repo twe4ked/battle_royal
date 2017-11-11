@@ -190,7 +190,9 @@ function setup() {
     y: app.renderer.height / 2,
     vx: 0,
     vy: 0,
-    id: Math.random().toString()
+    id: Math.random().toString(),
+    width: PIXI.utils.TextureCache["Player"].width,
+    height: PIXI.utils.TextureCache["Player"].height,
   }
 
   app.stage.addChild(playerSprites);
@@ -229,11 +231,17 @@ function setup() {
       }
     }
 
-    for (var position of world.loot) {
+    for (var loot of world.loot) {
       sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Loot"]);
       sprite.anchor.set(0.5);
-      sprite.x = position.x;
-      sprite.y = position.y;
+      sprite.x = loot.x;
+      sprite.y = loot.y;
+
+      if (collision(sprite, player)) {
+        socket.emit("gotLoot", {
+          lootId: loot.id
+        });
+      }
 
       lootSprites.addChild(sprite);
     }
@@ -434,6 +442,15 @@ function isClippableAt(x, y) {
   spriteName = app.stage.getChildAt(calculatedIndex).texture.textureCacheIds[0];
 
   return clippableSprites.indexOf(spriteName) !== -1;
+}
+
+function collision(r1, r2) {
+  return (
+    r1.x < r2.x + r2.width &&
+    r1.x + r1.width > r2.x &&
+    r1.y < r2.y + r2.height &&
+    r1.height + r1.y > r2.y
+  );
 }
 
 document.addEventListener("DOMContentLoaded", main);
