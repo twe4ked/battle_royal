@@ -210,7 +210,6 @@ function setup() {
   socket = io();
   socket.emit("announce", { name: player.id });
   socket.on("worldUpdated", function(msg) {
-    playerSprites.children = [];
     otherPlayerSprites.children = [];
     lootSprites.children = [];
 
