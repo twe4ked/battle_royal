@@ -68,10 +68,10 @@ function main() {
 }
 
 function setupKeyHandling() {
-  var leftKey = keyboard(65),
-  upKey = keyboard(87),
-  rightKey = keyboard(68),
-  downKey = keyboard(83),
+  var leftKey = keyboard(37),
+  upKey = keyboard(38),
+  rightKey = keyboard(39),
+  downKey = keyboard(40),
   spaceKey = keyboard(32);
 
   spaceKey.press = tryShoot;
