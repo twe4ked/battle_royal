@@ -32,7 +32,6 @@ io.on("connection", function(socket) {
     };
   });
 
-
   socket.on("shotsFired", function(payload) {
     console.log("Shot fired!", payload)
     io.emit("shotsFired", payload)
