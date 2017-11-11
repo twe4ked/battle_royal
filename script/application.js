@@ -209,7 +209,7 @@ function setup() {
 
   socket = io();
   socket.emit("announce", { name: player.id });
-  socket.on("world_updated", function(msg) {
+  socket.on("worldUpdated", function(msg) {
     playerSprites.children = [];
     lootSprites.children = [];
 
@@ -255,7 +255,7 @@ function setup() {
     }
   });
 
-  socket.on("player_hit", function(msg) {
+  socket.on("playerHit", function(msg) {
     if (msg.playerId == player.id) {
       reducePlayerHealth();
     }
@@ -282,7 +282,7 @@ function play() {
           Math.abs(projectile.y - world.clients[playerId].location.y) <=
           hitboxSize) {
         if(projectile.owner == player.id) {
-          socket.emit("player_hit", { playerId: playerId });
+          socket.emit("playerHit", { playerId: playerId });
         }
         projectile.vx = 0;
         projectile.vy = 0;

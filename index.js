@@ -50,15 +50,15 @@ io.on("connection", function(socket) {
     })
   })
 
-  socket.on("player_hit", function(msg) {
+  socket.on("playerHit", function(msg) {
     clients[msg.playerId].health -= 1;
-    io.emit("player_hit", msg);
+    io.emit("playerHit", msg);
   });
 
-  socket.on("player_dead", function(msg) {
+  socket.on("playerDead", function(msg) {
     clients[msg.playerId].health = 0;
     clients[msg.playerId].alive = false;
-    io.emit("player_dead", msg);
+    io.emit("playerDead", msg);
   });
 
   socket.on("disconnect", function() {
@@ -76,7 +76,7 @@ io.on("connection", function(socket) {
 setInterval(function() {
   let playersRemainingCount = _.filter(clients, (client) => (client.alive)).length
 
-  io.emit("world_updated", {
+  io.emit("worldUpdated", {
     clients,
     loot,
     playersRemainingCount,
