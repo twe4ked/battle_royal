@@ -1,4 +1,4 @@
-var app = new PIXI.Application(mapSize, mapSize, { backgroundColor: 0x000000 });
+var app = new PIXI.Application(mapSize, mapSize, { backgroundColor: 0xfacade });
 var tileSize = 32;
 var mapSize = tileSize * 64;  // 2048 x 2048 arena
 var gameTick = 0;
