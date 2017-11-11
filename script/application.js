@@ -134,8 +134,10 @@ function gameLoop() {
 }
 
 function play() {
-  player.x += player.vx;
-  player.y += player.vy;
+  if (isClippableAt(player.x + player.vx, player.y + player.vy)) {
+    player.x += player.vx;
+    player.y += player.vy;
+  }
 
   if (gameTick % 60 == 0) {
     socket.emit('game', {name: window.location.hash});
@@ -161,8 +163,8 @@ function renderInitialTiles() {
   var standardTileTexture = PIXI.utils.TextureCache["Standard Tile"];
   var tile =  null
 
-  for(var x = 0; x < mapSize; x+= tileSize) {
-    for(var y = 0; y < mapSize; y+= tileSize) {
+  for(var y = 0; y < mapSize; y+= tileSize) {
+    for(var x = 0; x < mapSize; x+= tileSize) {
 
       if (x == 0 && y == 0) {
         var tile = new PIXI.Sprite(topLeftTileTexture);
@@ -191,9 +193,17 @@ function renderInitialTiles() {
   }
 }
 
+function isClippableAt(x, y) {
+  clippableSprites = ['Standard Tile']
 
-function getSpriteNameAt(x,y) {
-  return app.stage.getChildAt(x,y).texture.textureCacheIds[0]
+  // the getChildAt simply gets the sprite at the array Index we give, we can
+  // calculate the array index from the given x and y values. The stage stores
+  // all of the sprites in a single array so we need to mutliple the y value by
+  // the offset of a row
+  calculatedIndex = Math.floor(x / tileSize) + (Math.floor(y / tileSize) * (mapSize / tileSize))
+  spriteName = app.stage.getChildAt(calculatedIndex).texture.textureCacheIds[0]
+
+  return clippableSprites.indexOf(spriteName) !== -1
 }
 
 document.addEventListener("DOMContentLoaded", main)
