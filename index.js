@@ -1,8 +1,10 @@
 var app = require("express")();
+var _ = require("lodash");
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var port = process.env.PORT || 3000;
 var clients = {};
+var loot = _.times(10, function() { return {x: _.random(0, 2047), y: _.random(0, 2047)} });
 
 app.get("*", function(req, res) {
   if (req.path === "/") {
@@ -45,7 +47,7 @@ io.on("connection", function(socket) {
 setInterval(function() {
   io.emit("world_updated", {
     clients: clients,
-    loot: [{x: 100, y: 100}]
+    loot: loot
   });
 }, 1000 / 60);
 
