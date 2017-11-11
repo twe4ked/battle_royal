@@ -55,30 +55,7 @@ function main() {
   PIXI.loader.add("assets/treasureHunter.json").load(setup);
 }
 
-var player;
-var world;
-var playerSprites = new PIXI.Container();
-function setup() {
-  document.body.appendChild(app.view);
-
-  app.renderer.view.style.position = "absolute";
-  app.renderer.view.style.display = "block";
-  app.renderer.autoResize = true;
-  app.renderer.resize(window.innerWidth, window.innerHeight);
-
-  window.addEventListener("optimizedResize", function() {
-    app.renderer.resize(window.innerWidth, window.innerHeight);
-  });
-
-  renderInitialTiles();
-
-  player = {x: 0, y: 0, vx: 0, vy: 0, id: Math.random()}
-
-  player.x = app.renderer.width / 2;
-  player.y = app.renderer.height / 2;
-
-  app.stage.addChild(playerSprites);
-
+function setupKeyHandling() {
   var leftKey = keyboard(37),
     upKey = keyboard(38),
     rightKey = keyboard(39),
@@ -112,6 +89,33 @@ function setup() {
   downKey.release = function() {
     player.vy = 0;
   };
+}
+
+var player;
+var world;
+var playerSprites = new PIXI.Container();
+function setup() {
+  document.body.appendChild(app.view);
+
+  app.renderer.view.style.position = "absolute";
+  app.renderer.view.style.display = "block";
+  app.renderer.autoResize = true;
+  app.renderer.resize(window.innerWidth, window.innerHeight);
+
+  window.addEventListener("optimizedResize", function() {
+    app.renderer.resize(window.innerWidth, window.innerHeight);
+  });
+
+  renderInitialTiles();
+
+  player = {x: 0, y: 0, vx: 0, vy: 0, id: Math.random()}
+
+  player.x = app.renderer.width / 2;
+  player.y = app.renderer.height / 2;
+
+  app.stage.addChild(playerSprites);
+
+  setupKeyHandling();
 
   socket = io();
   socket.emit("announce", { name: player.id });
