@@ -6,7 +6,9 @@ var throttle = function(type, name, obj) {
   obj = obj || window;
   var running = false;
   var func = function() {
-    if (running) { return; }
+    if (running) {
+      return;
+    }
     running = true;
     requestAnimationFrame(function() {
       obj.dispatchEvent(new CustomEvent(name));
@@ -49,11 +51,12 @@ function keyboard(keyCode) {
   return key;
 }
 
+var app = new PIXI.Application(mapSize, mapSize, { backgroundColor: 0x000000 });
+var tileSize = 32;
+var mapSize = tileSize * 64; // 2048 x 2048 arena
 
 function main() {
-  PIXI.loader
-    .add("assets/treasureHunter.json")
-    .load(setup);
+  PIXI.loader.add("assets/treasureHunter.json").load(setup);
 }
 
 var player;
@@ -69,9 +72,10 @@ function setup() {
     app.renderer.resize(window.innerWidth, window.innerHeight);
   });
 
-  renderInitialTiles()
+  renderInitialTiles();
 
   player = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
+  player.id = window.location.hash;
   player.vx = 0;
   player.vy = 0;
   player.anchor.set(0.5);
@@ -120,13 +124,15 @@ function setup() {
   };
 
   socket = io();
-  socket.on('game', function(msg) {
-    console.log(msg)
+  socket.emit("announce", { name: player.id });
+  socket.on("world_updated", function(msg) {
+    console.log("WORLD UPDATE!");
+    console.log(msg);
   });
 
   state = play;
-  gameLoop()
-};
+  gameLoop();
+}
 
 var gameTick = 0;
 
@@ -144,16 +150,14 @@ function play() {
     player.y += player.vy;
   }
 
-  if (gameTick % 60 == 0) {
-    socket.emit('game', {name: window.location.hash});
-  }
+  socket.emit("moved", { id: player.id, x: player.x, y: player.y });
 }
 
 function centreViewportOnPlayer() {
-  var newX = (app.renderer.screen.width / 2) - player.x
-  var newY = (app.renderer.screen.height / 2) - player.y
+  var newX = app.renderer.screen.width / 2 - player.x;
+  var newY = app.renderer.screen.height / 2 - player.y;
 
-  app.stage.setTransform(newX, newY)
+  app.stage.setTransform(newX, newY);
 }
 
 function renderInitialTiles() {
@@ -168,16 +172,15 @@ function renderInitialTiles() {
   var standardTileTexture = PIXI.utils.TextureCache["Standard Tile"];
   var tile =  null
 
-  for(var y = 0; y < mapSize; y+= tileSize) {
-    for(var x = 0; x < mapSize; x+= tileSize) {
-
+  for (var x = 0; x < mapSize; x += tileSize) {
+    for (var y = 0; y < mapSize; y += tileSize) {
       if (x == 0 && y == 0) {
         var tile = new PIXI.Sprite(topLeftTileTexture);
       } else if (y == 0 && x + tileSize >= mapSize) {
         var tile = new PIXI.Sprite(topRightTileTexture);
       } else if (y == 0) {
         var tile = new PIXI.Sprite(topTileTexture);
-      } else if ((y + tileSize >= mapSize) && (x + tileSize >= mapSize)) {
+      } else if (y + tileSize >= mapSize && x + tileSize >= mapSize) {
         var tile = new PIXI.Sprite(bottomRightTileTexture);
       } else if (x + tileSize >= mapSize) {
         var tile = new PIXI.Sprite(rightTileTexture);
@@ -191,8 +194,8 @@ function renderInitialTiles() {
         var tile = new PIXI.Sprite(standardTileTexture);
       }
 
-      tile.x = x
-      tile.y = y
+      tile.x = x;
+      tile.y = y;
       app.stage.addChild(tile);
     }
   }
