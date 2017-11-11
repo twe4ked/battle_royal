@@ -10,6 +10,7 @@ var projectileSpeed = 20;
 var world;
 var playerSprites = new PIXI.Container();
 var lootSprites = new PIXI.Container();
+var playerLastDirection = 'down';
 
 var throttle = function(type, name, obj) {
   obj = obj || window;
@@ -75,6 +76,7 @@ function setupKeyHandling() {
 
   leftKey.press = function() {
     player.vx = -playerMovementSpeed;
+    playerLastDirection = 'left';
   }
 
   leftKey.release = function() {
@@ -83,6 +85,7 @@ function setupKeyHandling() {
 
   upKey.press = function() {
     player.vy = -playerMovementSpeed;
+    playerLastDirection = 'up';
   };
 
   upKey.release = function() {
@@ -91,6 +94,7 @@ function setupKeyHandling() {
 
   rightKey.press = function() {
     player.vx = playerMovementSpeed;
+    playerLastDirection = 'right';
   };
   rightKey.release = function() {
     player.vx = 0;
@@ -98,6 +102,7 @@ function setupKeyHandling() {
 
   downKey.press = function() {
     player.vy = playerMovementSpeed;
+    playerLastDirection = 'down';
   };
 
   downKey.release = function() {
@@ -225,7 +230,7 @@ function play() {
 
   // remove projectiles that have collided with walls
   projectiles = projectiles.filter(function(projectile) {
-    return  (projectile.vx != 0 || projectile.vy != 0)
+    return !(projectile.vx == 0 && projectile.vy == 0)
   })
 }
 
@@ -280,8 +285,18 @@ function renderInitialTiles() {
 function tryShoot() {
   if (canShootNext <= gameTick) {
     var projectile = new PIXI.Sprite(PIXI.utils.TextureCache["Projectile"]);
-    projectile.vx = Math.round(Math.sin(player.rotation) * projectileSpeed)
-    projectile.vy = -(Math.round(Math.cos(player.rotation)) * projectileSpeed)
+    projectile.vy = 0
+    projectile.vx = 0
+
+    if (playerLastDirection == 'up') {
+      projectile.vy = -projectileSpeed;
+    } else if (playerLastDirection == 'down') {
+      projectile.vy = projectileSpeed;
+    } else if (playerLastDirection == 'left') {
+      projectile.vx = -projectileSpeed;
+    } else if (playerLastDirection == 'right') {
+      projectile.vx = projectileSpeed;
+    }
 
     projectile.x = player.x
     projectile.y = player.y
@@ -301,8 +316,7 @@ function isClippableAt(x, y) {
   // calculate the array index from the given x and y values. The stage stores
   // all of the sprites in a single array so we need to mutliple the y value by
   // the offset of a row
-  calculatedIndex =
-    Math.floor(x / tileSize) + Math.floor(y / tileSize) * (mapSize / tileSize);
+  calculatedIndex = Math.floor(x / tileSize) + (Math.floor(y / tileSize) * (mapSize / tileSize));
   spriteName = app.stage.getChildAt(calculatedIndex).texture.textureCacheIds[0];
 
   return clippableSprites.indexOf(spriteName) !== -1;
