@@ -1,6 +1,14 @@
 var app = new PIXI.Application(mapSize, mapSize, { backgroundColor: 0x000000 });
 var tileSize = 32;
-var mapSize = tileSize * 64; // 2048 x 2048 arena
+var mapSize = tileSize * 64;  // 2048 x 2048 arena
+var gameTick = 0;
+var player;
+var projectiles = [];
+var canShootNext = 0;
+var playerMovementSpeed = 5;
+var projectileSpeed = 20;
+var world;
+var playerSprites = new PIXI.Container();
 
 var throttle = function(type, name, obj) {
   obj = obj || window;
@@ -57,19 +65,23 @@ function main() {
 
 function setupKeyHandling() {
   var leftKey = keyboard(37),
-    upKey = keyboard(38),
-    rightKey = keyboard(39),
-    downKey = keyboard(40);
+  upKey = keyboard(38),
+  rightKey = keyboard(39),
+  downKey = keyboard(40),
+  spaceKey = keyboard(32);
+
+  spaceKey.press = tryShoot;
 
   leftKey.press = function() {
-    player.vx = -5
-  };
+    player.vx = -playerMovementSpeed;
+  }
+
   leftKey.release = function() {
     player.vx = 0;
   };
 
   upKey.press = function() {
-    player.vy = -5
+    player.vy = -playerMovementSpeed;
   };
 
   upKey.release = function() {
@@ -77,23 +89,46 @@ function setupKeyHandling() {
   };
 
   rightKey.press = function() {
-    player.vx = 5;
+    player.vx = playerMovementSpeed;
   };
   rightKey.release = function() {
     player.vx = 0;
   };
 
   downKey.press = function() {
-    player.vy = 5;
+    player.vy = playerMovementSpeed;
   };
+
   downKey.release = function() {
     player.vy = 0;
   };
 }
 
-var player;
-var world;
-var playerSprites = new PIXI.Container();
+function setup() {
+  document.body.appendChild(app.view);
+
+  app.renderer.view.style.position = "absolute";
+  app.renderer.view.style.display = "block";
+  app.renderer.autoResize = true;
+  app.renderer.resize(window.innerWidth, window.innerHeight);
+
+  window.addEventListener("optimizedResize", function() {
+    app.renderer.resize(window.innerWidth, window.innerHeight);
+  });
+
+  renderInitialTiles()
+
+  player = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
+  player.vx = 0;
+  player.vy = 0;
+  player.anchor.set(0.5);
+
+  player.x = app.renderer.width / 2;
+  player.y = app.renderer.height / 2;
+
+  app.stage.addChild(player);
+}
+
 function setup() {
   document.body.appendChild(app.view);
 
@@ -148,8 +183,6 @@ function setup() {
   gameLoop();
 }
 
-var gameTick = 0;
-
 function gameLoop() {
   gameTick++;
   centreViewportOnPlayer();
@@ -165,6 +198,27 @@ function play() {
   }
 
   socket.emit("moved", { id: player.id, x: player.x, y: player.y });
+
+  // Move projectiles that are in motion
+  projectiles.forEach(function(projectile) {
+    if (isClippableAt(projectile.x + projectile.vx, projectile.y + projectile.vy)) {
+      projectile.x += projectile.vx;
+      projectile.y += projectile.vy;
+    } else {
+      projectile.parent.removeChild(projectile)
+      projectile.vx = 0;
+      projectile.vy = 0;
+    }
+  })
+
+  // remove projectiles that have collided with walls
+  projectiles = projectiles.filter(function(projectile) {
+    return  (projectile.vx != 0 || projectile.vy != 0)
+  })
+
+  if (gameTick % 60 == 0) {
+    socket.emit('game', {name: window.location.hash});
+  }
 }
 
 function centreViewportOnPlayer() {
@@ -212,6 +266,23 @@ function renderInitialTiles() {
       tile.y = y;
       app.stage.addChild(tile);
     }
+  }
+}
+
+function tryShoot() {
+  if (canShootNext <= gameTick) {
+    var projectile = new PIXI.Sprite(PIXI.utils.TextureCache["Projectile"]);
+    projectile.vx = Math.round(Math.sin(player.rotation) * projectileSpeed)
+    projectile.vy = -(Math.round(Math.cos(player.rotation)) * projectileSpeed)
+
+    projectile.x = player.x
+    projectile.y = player.y
+    projectile.anchor.set(0.5);
+
+    app.stage.addChild(projectile);
+    projectiles.push(projectile)
+
+    canShootNext = gameTick + 30;
   }
 }
 
