@@ -428,7 +428,7 @@ function reducePlayerHealth() {
 
 function playerDead() {
   healthBar.message.text = " ☠️ ";
-  socket.emit("player_dead", { playerId: player.id });
+  socket.emit("playerDead", { playerId: player.id });
 }
 
 function isClippableAt(x, y) {
