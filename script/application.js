@@ -1,6 +1,6 @@
-var app = new PIXI.Application(mapSize, mapSize, {backgroundColor : 0x000000});
+var app = new PIXI.Application(mapSize, mapSize, { backgroundColor: 0x000000 });
 var tileSize = 32;
-var mapSize = tileSize * 64;  // 2048 x 2048 arena
+var mapSize = tileSize * 64; // 2048 x 2048 arena
 
 var throttle = function(type, name, obj) {
   obj = obj || window;
@@ -51,10 +51,6 @@ function keyboard(keyCode) {
   return key;
 }
 
-var app = new PIXI.Application(mapSize, mapSize, { backgroundColor: 0x000000 });
-var tileSize = 32;
-var mapSize = tileSize * 64; // 2048 x 2048 arena
-
 function main() {
   PIXI.loader.add("assets/treasureHunter.json").load(setup);
 }
@@ -93,10 +89,10 @@ function setup() {
     rightKey = keyboard(39),
     downKey = keyboard(40);
 
-  pi = 3.14159
+  pi = 3.14159;
   leftKey.press = function() {
     player.vx = -5;
-    player.rotation = pi / 2 + pi
+    player.rotation = pi / 2 + pi;
   };
   leftKey.release = function() {
     player.vx = 0;
@@ -104,7 +100,7 @@ function setup() {
 
   upKey.press = function() {
     player.vy = -5;
-    player.rotation = pi * 2
+    player.rotation = pi * 2;
   };
   upKey.release = function() {
     player.vy = 0;
@@ -112,7 +108,7 @@ function setup() {
 
   rightKey.press = function() {
     player.vx = 5;
-    player.rotation = pi / 2
+    player.rotation = pi / 2;
   };
   rightKey.release = function() {
     player.vx = 0;
@@ -120,7 +116,7 @@ function setup() {
 
   downKey.press = function() {
     player.vy = 5;
-    player.rotation = pi
+    player.rotation = pi;
   };
   downKey.release = function() {
     player.vy = 0;
@@ -136,7 +132,7 @@ function setup() {
       var entity = world[playerId];
 
       if (entity.location) {
-        sprite = new PIXI.Sprite(PIXI.utils.TextureCache["explorer.png"]);
+        sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
         sprite.anchor.set(0.5);
         sprite.x = entity.location.x;
         sprite.y = entity.location.y;
@@ -186,7 +182,7 @@ function renderInitialTiles() {
   var bottomRightTileTexture = PIXI.utils.TextureCache["Bottom Right Tile"];
   var bottomTileTexture = PIXI.utils.TextureCache["Bottom Tile"];
   var standardTileTexture = PIXI.utils.TextureCache["Standard Tile"];
-  var tile =  null
+  var tile = null;
 
   for (var x = 0; x < mapSize; x += tileSize) {
     for (var y = 0; y < mapSize; y += tileSize) {
@@ -218,16 +214,17 @@ function renderInitialTiles() {
 }
 
 function isClippableAt(x, y) {
-  clippableSprites = ['Standard Tile']
+  clippableSprites = ["Standard Tile"];
 
   // the getChildAt simply gets the sprite at the array Index we give, we can
   // calculate the array index from the given x and y values. The stage stores
   // all of the sprites in a single array so we need to mutliple the y value by
   // the offset of a row
-  calculatedIndex = Math.floor(x / tileSize) + (Math.floor(y / tileSize) * (mapSize / tileSize))
-  spriteName = app.stage.getChildAt(calculatedIndex).texture.textureCacheIds[0]
+  calculatedIndex =
+    Math.floor(x / tileSize) + Math.floor(y / tileSize) * (mapSize / tileSize);
+  spriteName = app.stage.getChildAt(calculatedIndex).texture.textureCacheIds[0];
 
-  return clippableSprites.indexOf(spriteName) !== -1
+  return clippableSprites.indexOf(spriteName) !== -1;
 }
 
-document.addEventListener("DOMContentLoaded", main)
+document.addEventListener("DOMContentLoaded", main);
