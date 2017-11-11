@@ -453,7 +453,7 @@ function calculateProjectileFromPlayer() {
 }
 
 function notifyServerOfShotFired(projectile) {
-    socket.emit('shotsFired', {
+    socket.emit("shotsFired", {
       x: projectile.x,
       y: projectile.y,
       vx: projectile.vx,
