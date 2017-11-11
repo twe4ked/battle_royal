@@ -10,7 +10,6 @@ var projectileSpeed = 20;
 var world = {};
 var otherPlayerSprites = new PIXI.Container();
 var lootSprites = new PIXI.Container();
-var playerLastDirection = 'down';
 var healthBar;
 var playersRemainingMessage;
 var overlayContainer;
@@ -100,10 +99,8 @@ function calculatePlayerVelocity() {
   if (mag > 0) {
     player.direction = {x: directionVector.x / mag, y: directionVector.y / mag}
     player.lastDirection = player.direction
-    player.moving = true
   } else {
     player.direction = {x: 0, y: 0}
-    player.moving = false
   }
 
   player.vx = playerMovementSpeed * player.direction.x
@@ -191,6 +188,8 @@ function setup() {
     id: Math.random().toString(),
     width: PIXI.utils.TextureCache["Player"].width,
     height: PIXI.utils.TextureCache["Player"].height,
+    direction: {x: 0, y: 0},
+    lastDirection: {x: 0, y: 0}
   }
 
   app.stage.addChild(otherPlayerSprites);
@@ -393,10 +392,9 @@ function registerProjectile({x, y, vx, vy, owner}) {
 
 function calculateProjectileFromPlayer() {
   var projectile = {vx: 0, vy: 0}
-  var direction = player.moving ? player.direction : player.lastDirection
 
-  projectile.vx = direction.x * projectileSpeed
-  projectile.vy = direction.y * projectileSpeed
+  projectile.vx = player.lastDirection.x * projectileSpeed
+  projectile.vy = player.lastDirection.y * projectileSpeed
   projectile.x = player.x
   projectile.y = player.y
   projectile.owner = player.id
