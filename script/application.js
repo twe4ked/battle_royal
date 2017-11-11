@@ -3,7 +3,7 @@ const PROJECTILE_SPEED = 20;
 const TILE_SIZE = 32;
 const MAP_SIZE = TILE_SIZE * 64;  // 2048 x 2048 arena
 
-var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0xfacade });
+var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0x222222 });
 var gameTick = 0;
 var player;
 var projectiles = [];
