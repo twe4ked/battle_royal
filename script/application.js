@@ -82,7 +82,9 @@ function setupKeyHandling() {
   }
 
   leftKey.release = function() {
-    player.vx = 0;
+    if (player.vx < 0) {
+      player.vx = 0
+    }
   };
 
   upKey.press = function() {
@@ -91,7 +93,9 @@ function setupKeyHandling() {
   };
 
   upKey.release = function() {
-    player.vy = 0;
+    if (player.vy < 0) {
+      player.vy = 0;
+    }
   };
 
   rightKey.press = function() {
@@ -99,7 +103,9 @@ function setupKeyHandling() {
     playerLastDirection = 'right';
   };
   rightKey.release = function() {
-    player.vx = 0;
+    if (player.vx > 0) {
+      player.vx = 0;
+    }
   };
 
   downKey.press = function() {
@@ -108,7 +114,9 @@ function setupKeyHandling() {
   };
 
   downKey.release = function() {
-    player.vy = 0;
+    if (player.vy > 0) {
+      player.vy = 0;
+    }
   };
 }
 
