@@ -68,52 +68,57 @@ function main() {
 }
 
 function setupKeyHandling() {
-  var leftKey = keyboard(37),
-  upKey = keyboard(38),
-  rightKey = keyboard(39),
-  downKey = keyboard(40),
-  spaceKey = keyboard(32);
+  var
+    leftKey = keyboard(37),
+    upKey = keyboard(38),
+    rightKey = keyboard(39),
+    downKey = keyboard(40),
+    spaceKey = keyboard(32),
+    aKey = keyboard(65),
+    wKey = keyboard(87),
+    dKey = keyboard(68),
+    sKey = keyboard(83);
 
   spaceKey.press = tryShoot;
 
-  leftKey.press = function() {
+  aKey.press = leftKey.press = function() {
     player.vx = -playerMovementSpeed;
     playerLastDirection = 'left';
   }
 
-  leftKey.release = function() {
+  aKey.release = leftKey.release = function() {
     if (player.vx < 0) {
       player.vx = 0
     }
   };
 
-  upKey.press = function() {
+  wKey.press = upKey.press = function() {
     player.vy = -playerMovementSpeed;
     playerLastDirection = 'up';
   };
 
-  upKey.release = function() {
+  wKey.release = upKey.release = function() {
     if (player.vy < 0) {
       player.vy = 0;
     }
   };
 
-  rightKey.press = function() {
+  dKey.press = rightKey.press = function() {
     player.vx = playerMovementSpeed;
     playerLastDirection = 'right';
   };
-  rightKey.release = function() {
+  dKey.release = rightKey.release = function() {
     if (player.vx > 0) {
       player.vx = 0;
     }
   };
 
-  downKey.press = function() {
+  sKey.press = downKey.press = function() {
     player.vy = playerMovementSpeed;
     playerLastDirection = 'down';
   };
 
-  downKey.release = function() {
+  sKey.release = downKey.release = function() {
     if (player.vy > 0) {
       player.vy = 0;
     }
