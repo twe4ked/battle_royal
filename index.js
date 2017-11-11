@@ -4,7 +4,14 @@ var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var port = process.env.PORT || 3000;
 var clients = {};
-var loot = _.times(10, function() { return {x: _.random(0, 2047), y: _.random(0, 2047)} });
+// TODO: `loot` should be a hash with the `id` as the key.
+var loot = _.times(10, function() {
+  return {
+    id: Math.random().toString(),
+    x: _.random(0, 2047),
+    y: _.random(0, 2047),
+  }
+});
 
 app.get("*", function(req, res) {
   if (req.path === "/") {
@@ -32,21 +39,26 @@ io.on("connection", function(socket) {
     };
   });
 
-
   socket.on("shotsFired", function(payload) {
     console.log("Shot fired!", payload)
     io.emit("shotsFired", payload)
   });
 
-  socket.on("player_hit", function(msg) {
+  socket.on("gotLoot", function(payload) {
+    loot = _.reject(loot, function(l) {
+      return l.id === payload.lootId
+    })
+  })
+
+  socket.on("playerHit", function(msg) {
     clients[msg.playerId].health -= 1;
-    io.emit("player_hit", msg);
+    io.emit("playerHit", msg);
   });
 
-  socket.on("player_dead", function(msg) {
+  socket.on("playerDead", function(msg) {
     clients[msg.playerId].health = 0;
     clients[msg.playerId].alive = false;
-    io.emit("player_dead", msg);
+    io.emit("playerDead", msg);
   });
 
   socket.on("disconnect", function() {
@@ -64,7 +76,7 @@ io.on("connection", function(socket) {
 setInterval(function() {
   let playersRemainingCount = _.filter(clients, (client) => (client.alive)).length
 
-  io.emit("world_updated", {
+  io.emit("worldUpdated", {
     clients,
     loot,
     playersRemainingCount,
