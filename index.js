@@ -14,14 +14,7 @@ app.get("*", function(req, res) {
 
 io.on("connection", function(socket) {
   socket.on("announce", function(player) {
-    var player = { connected: true, name: player.name };
-    clients[player.name] = player;
-
-    console.log("All players:");
-
-    for (var client in clients) {
-      console.log(client);
-    }
+    clients[player.name] = { name: player.name, socket: socket.id };
   });
 
   socket.on("moved", function(locationMsg) {
@@ -38,7 +31,14 @@ io.on("connection", function(socket) {
   });
 
   socket.on("disconnect", function() {
-    console.log(`should get rid of somebody..`);
+    console.log(`Disconnecting ${socket.id}`)
+    var newClients = {}
+    for (var client_id in clients) {
+      if (clients[client_id].socket != socket.id) {
+        newClients[client_id] = clients[client_id]
+      }
+    }
+    clients = newClients
   });
 });
 
