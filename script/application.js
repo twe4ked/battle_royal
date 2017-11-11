@@ -244,7 +244,6 @@ function setup() {
     app.renderer.resize(window.innerWidth, window.innerHeight);
   });
 
-
   setupStage();
   renderInitialTiles();
 
@@ -296,7 +295,6 @@ function gameLoop() {
   state();
   app.renderer.render(app.stage);
 }
-
 
 function play() {
   calculatePlayerVelocity()
