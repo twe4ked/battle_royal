@@ -15,6 +15,8 @@ var playersRemainingMessage;
 var overlayContainer;
 var hitboxSize = tileSize / 2;
 var controls;
+var outerFogOfWar;
+var innerFogOfWar;
 
 var throttle = function(type, name, obj) {
   obj = obj || window;
@@ -181,6 +183,7 @@ function setup() {
   renderInitialTiles();
 
   player = {
+    initialized: false,
     x: app.renderer.width / 2,
     y: app.renderer.height / 2,
     vx: 0,
@@ -277,6 +280,7 @@ function gameLoop() {
   app.renderer.render(app.stage);
 }
 
+
 function play() {
   calculatePlayerVelocity()
 
@@ -297,17 +301,47 @@ function play() {
     }
   })
 
-  if (isClippableAt(player.x + player.vx, player.y + player.vy)) {
-    player.x += player.vx;
-    player.y += player.vy;
+  if (!player.initialized || !(player.vx == 0 && player.vy == 0)) {
+    player.initialized = true;
 
-    if (player.sprite) {
-      player.sprite.x = player.x;
-      player.sprite.y = player.y;
+    if (isClippableAt(player.x + player.vx, player.y + player.vy)) {
+      player.x += player.vx;
+      player.y += player.vy;
+
+      if (player.sprite) {
+        player.sprite.x = player.x;
+        player.sprite.y = player.y;
+
+        if (outerFogOfWar === undefined) {
+          innerFogOfWar = new PIXI.Graphics();
+          innerFogOfWar.lineStyle(window.innerWidth / 7, 0x000000, 0.8);
+          innerFogOfWar.beginFill(0x000000, 0);
+          innerFogOfWar.drawCircle(0, 0, window.innerWidth / 3.5);
+          innerFogOfWar.endFill();
+          innerFogOfWar.x = player.x;
+          innerFogOfWar.y = player.y;
+          app.stage.addChild(innerFogOfWar);
+
+          outerFogOfWar = new PIXI.Graphics();
+          outerFogOfWar.lineStyle(window.innerWidth / 3, 0x000000, 1);
+          outerFogOfWar.beginFill(0x000000, 0.1);
+          outerFogOfWar.drawCircle(0, 0, window.innerWidth / 2);
+          outerFogOfWar.endFill();
+          outerFogOfWar.x = player.x;
+          outerFogOfWar.y = player.y;
+          app.stage.addChild(outerFogOfWar);
+
+        } else {
+          innerFogOfWar.x = player.x;
+          innerFogOfWar.y = player.y;
+          outerFogOfWar.x = player.x;
+          outerFogOfWar.y = player.y;
+        }
+      }
     }
-  }
 
-  socket.emit("moved", { id: player.id, x: player.x, y: player.y });
+    socket.emit("moved", { id: player.id, x: player.x, y: player.y });
+  }
 
   // Move projectiles that are in motion
   projectiles.forEach(function(projectile) {
