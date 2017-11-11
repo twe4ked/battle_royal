@@ -145,7 +145,7 @@ function setupHealthBar() {
 }
 
 function updatePlayersRemainingMessage() {
-  if (!world.playersRemainingCount) { return; }
+  if (world.playersRemainingCount === undefined) { return; }
 
   playersRemainingMessage.text = `Players Remaining: ${world.playersRemainingCount}`
 }
