@@ -9,6 +9,7 @@ var playerMovementSpeed = 5;
 var projectileSpeed = 20;
 var world;
 var playerSprites = new PIXI.Container();
+var lootSprites = new PIXI.Container();
 
 var throttle = function(type, name, obj) {
   obj = obj || window;
@@ -152,6 +153,7 @@ function setup() {
   }
 
   app.stage.addChild(playerSprites);
+  app.stage.addChild(lootSprites);
 
   setupKeyHandling();
 
@@ -159,6 +161,7 @@ function setup() {
   socket.emit("announce", { name: player.id });
   socket.on("world_updated", function(msg) {
     playerSprites.children = [];
+    lootSprites.children = [];
 
     world = msg;
     for (var playerId in world.clients) {
@@ -176,6 +179,15 @@ function setup() {
 
         playerSprites.addChild(sprite);
       }
+    }
+
+    for (var position of world.loot) {
+      sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Loot"]);
+      sprite.anchor.set(0.5);
+      sprite.x = position.x;
+      sprite.y = position.y;
+
+      lootSprites.addChild(sprite);
     }
   });
 

@@ -43,7 +43,10 @@ io.on("connection", function(socket) {
 });
 
 setInterval(function() {
-  io.emit("world_updated", {clients: clients});
+  io.emit("world_updated", {
+    clients: clients,
+    loot: [{x: 100, y: 100}]
+  });
 }, 1000 / 60);
 
 http.listen(port, function() {
