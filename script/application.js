@@ -453,13 +453,13 @@ function calculateProjectileFromPlayer() {
 }
 
 function notifyServerOfShotFired(projectile) {
-    socket.emit("shotsFired", {
-      x: projectile.x,
-      y: projectile.y,
-      vx: projectile.vx,
-      vy: projectile.vy,
-      owner: player.id
-    })
+  socket.emit("shotsFired", {
+    x: projectile.x,
+    y: projectile.y,
+    vx: projectile.vx,
+    vy: projectile.vy,
+    owner: player.id
+  })
 }
 
 function tryShoot() {
