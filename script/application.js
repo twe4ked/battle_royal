@@ -440,11 +440,11 @@ function reducePlayerHealth() {
 
 function playerDead() {
   healthBar.message.text = " ☠️ ";
-  deathScreen();
+  showDeathScreen();
   socket.emit("playerDead", { playerId: player.id });
 }
 
-function deathScreen() {
+function showDeathScreen() {
   message = new PIXI.Text(
     "YOU DED\n" + "BETTER LUCK NEXT TIME!",
     {fontSize: "64px", fontFamily: "Comic Sans MS", fill: "white"}
