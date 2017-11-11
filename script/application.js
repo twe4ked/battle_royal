@@ -288,7 +288,7 @@ function play() {
           Math.abs(projectile.y - world.clients[playerId].location.y) <=
           hitboxSize) {
         if(projectile.owner == player.id) {
-          socket.emit("playerHit", { playerId: playerId });
+          socket.emit("playerHit", { reporterId: player.id, playerId: playerId });
         }
         projectile.vx = 0;
         projectile.vy = 0;

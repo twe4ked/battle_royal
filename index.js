@@ -24,17 +24,18 @@ app.get("*", function(req, res) {
   }
 });
 
+function playerIsUnworthy(playerId) {
+  player = clients[playerId]
+  return (player === undefined || player.alive !== true)
+}
+
 io.on("connection", function(socket) {
   socket.on("announce", function(player) {
     clients[player.name] = { name: player.name, socket: socket.id, health: 5, alive: true };
   });
 
   socket.on("moved", function(locationMsg) {
-    player = clients[locationMsg.id];
-
-    if (!player) {
-      return;
-    }
+    if (playerIsUnworthy(locationMsg.id)) { return }
 
     player.location = {
       x: locationMsg.x,
@@ -43,6 +44,8 @@ io.on("connection", function(socket) {
   });
 
   socket.on("shotsFired", function(payload) {
+    if (playerIsUnworthy(payload.owner)) { return }
+
     console.log("Shot fired!", payload)
     io.emit("shotsFired", payload)
   });
@@ -54,6 +57,8 @@ io.on("connection", function(socket) {
   })
 
   socket.on("playerHit", function(msg) {
+    if (playerIsUnworthy(msg.reporterId)) { return }
+
     clients[msg.playerId].health -= 1;
     io.emit("playerHit", msg);
   });
