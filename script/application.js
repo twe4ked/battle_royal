@@ -2,7 +2,7 @@ const PLAYER_MOVEMENT_SPEED = 5;
 const PROJECTILE_SPEED = 20;
 const TILES_IN_BIG_TILE = 13;
 const TILE_SIZE = 32;
-const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * 16) + 2));  // (210 x 210 tile) arena, change TILES_IN_BIG_TILE multiplier to alter size.
+const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * 16) + 2)); // (210 x 210 tile) arena, change TILES_IN_BIG_TILE multiplier to alter size.
 
 var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0x006699 });
 var gameTick = 0;
