@@ -26,13 +26,13 @@
     "sourceSize": {"w":21,"h":32},
     "pivot": {"x":0.5,"y":0.5}
   },
-  "Standard Tile":
+  "13x Standard Tile":
   {
-    "frame": {"x":34,"y":68,"w":32,"h":32},
+    "frame": {"x":34,"y":68,"w":416,"h":416},
     "rotated": false,
     "trimmed": false,
-    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-    "sourceSize": {"w":32,"h":32},
+    "spriteSourceSize": {"x":0,"y":0,"w":416,"h":416},
+    "sourceSize": {"w":416,"h":416},
     "pivot": {"x":0.5,"y":0.5}
   },
   "Door":
@@ -56,20 +56,20 @@
 
   "Top Tile":
   {
-    "frame": {"x":34,"y":36,"w":32,"h":32},
+    "frame": {"x":34,"y":36,"w":416,"h":32},
     "rotated": false,
     "trimmed": false,
-    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-    "sourceSize": {"w":32,"h":32},
+    "spriteSourceSize": {"x":0,"y":0,"w":416,"h":32},
+    "sourceSize": {"w":416,"h":32},
     "pivot": {"x":0.5,"y":0.5}
   },
   "Bottom Tile":
   {
-    "frame": {"x":66,"y":518,"w":32,"h":32},
+    "frame": {"x":66,"y":518,"w":416,"h":32},
     "rotated": false,
     "trimmed": false,
-    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-    "sourceSize": {"w":32,"h":32},
+    "spriteSourceSize": {"x":0,"y":0,"w":416,"h":32},
+    "sourceSize": {"w":416,"h":32},
     "pivot": {"x":0.5,"y":0.5}
   },
   "Bottom Left Tile":
@@ -92,20 +92,20 @@
   },
   "Left Tile":
   {
-    "frame": {"x":2,"y":68,"w":32,"h":32},
+    "frame": {"x":2,"y":68,"w":32,"h":416},
     "rotated": false,
     "trimmed": false,
-    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-    "sourceSize": {"w":32,"h":32},
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":416},
+    "sourceSize": {"w":32,"h":416},
     "pivot": {"x":0.5,"y":0.5}
   },
   "Right Tile":
   {
-    "frame": {"x":482,"y":68,"w":32,"h":32},
+    "frame": {"x":482,"y":68,"w":32,"h":416},
     "rotated": false,
     "trimmed": false,
-    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-    "sourceSize": {"w":32,"h":32},
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":416},
+    "sourceSize": {"w":32,"h":416},
     "pivot": {"x":0.5,"y":0.5}
   },
 

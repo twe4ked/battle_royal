@@ -1,19 +1,34 @@
-var app = new PIXI.Application(mapSize, mapSize, { backgroundColor: 0xfacade });
-var tileSize = 32;
-var mapSize = tileSize * 64;  // 2048 x 2048 arena
+// TODO:
+//
+//  - Lobby screen
+//  - Randomised spawns
+//  - End of game screen
+//  - Death circle
+//  - Names (JS prompt)
+
+const PLAYER_MOVEMENT_SPEED = 5;
+const PROJECTILE_SPEED = 20;
+const TILES_IN_BIG_TILE = 13;
+const TILE_SIZE = 32;
+const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * 16) + 2)); // (210 x 210 tile) arena, change TILES_IN_BIG_TILE multiplier to alter size.
+const INITIAL_PLAYER_HEALTH = 128
+
+var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0x006699 });
 var gameTick = 0;
 var player;
 var projectiles = [];
 var canShootNext = 0;
-var playerMovementSpeed = 5;
-var projectileSpeed = 20;
 var world = {};
 var otherPlayerSprites = new PIXI.Container();
 var lootSprites = new PIXI.Container();
+var tileContainer = new PIXI.Container();
+var overlayContainer = new PIXI.Container();
+var fogOfWarContainer = new PIXI.Container();
+var currentPlayerContainer = new PIXI.Container();
+var projectileContainer = new PIXI.Container();
 var healthBar;
 var playersRemainingMessage;
-var overlayContainer;
-var hitboxSize = tileSize / 2;
+var hitboxSize = TILE_SIZE / 2;
 var controls;
 var outerFogOfWar;
 var innerFogOfWar;
@@ -94,7 +109,7 @@ function calculatePlayerVelocity() {
   if (controls.dKey.isDown || controls.rightKey.isDown) { directionVector.x += 1 }
   if (controls.wKey.isDown || controls.upKey.isDown) { directionVector.y -= 1 }
   if (controls.sKey.isDown || controls.downKey.isDown) { directionVector.y += 1 }
-  
+
   var squaredTerms = directionVector.x * directionVector.x + directionVector.y * directionVector.y
   var mag = Math.sqrt(squaredTerms)
 
@@ -105,8 +120,8 @@ function calculatePlayerVelocity() {
     player.direction = {x: 0, y: 0}
   }
 
-  player.vx = playerMovementSpeed * player.direction.x
-  player.vy = playerMovementSpeed * player.direction.y
+  player.vx = PLAYER_MOVEMENT_SPEED * player.direction.x
+  player.vy = PLAYER_MOVEMENT_SPEED * player.direction.y
 }
 
 function setupHealthBar() {
@@ -116,7 +131,7 @@ function setupHealthBar() {
 
   //Create the black background rectangle
   var innerBar = new PIXI.Graphics();
-  innerBar.beginFill(0x000000);
+  innerBar.beginFill(0x666666);
   innerBar.drawRect(0, 0, 130, 22);
   innerBar.endFill();
   healthBar.addChild(innerBar);
@@ -124,7 +139,7 @@ function setupHealthBar() {
   //Create the front red rectangle
   var outerBar = new PIXI.Graphics();
   outerBar.beginFill(0xFF3300);
-  outerBar.drawRect(1, 1, 128, 20);
+  outerBar.drawRect(1, 1, INITIAL_PLAYER_HEALTH, 20);
   outerBar.endFill();
   healthBar.addChild(outerBar);
   message = new PIXI.Text(
@@ -152,7 +167,7 @@ function setupPlayersRemainingBar() {
   bar.position.set(300, 10)
 
   var innerBar = new PIXI.Graphics();
-  innerBar.beginFill(0x000000);
+  innerBar.beginFill(0x666666);
   innerBar.drawRect(0, 0, 130, 22);
   innerBar.endFill();
   bar.addChild(innerBar);
@@ -168,6 +183,66 @@ function setupPlayersRemainingBar() {
   overlayContainer.addChild(bar)
 }
 
+function worldUpdated(msg) {
+  otherPlayerSprites.children = [];
+  lootSprites.children = [];
+
+  world = msg;
+  for (var playerId in world.clients) {
+    var entity = world.clients[playerId];
+
+    if (entity.location) {
+      if (playerId == player.id) {
+        if(player.sprite === undefined) {
+          player.sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
+          player.sprite.anchor.set(0.5);
+          player.sprite.x = entity.location.x;
+          player.sprite.y = entity.location.y;
+
+          currentPlayerContainer.addChild(player.sprite)
+        }
+      } else {
+        sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Blob"]);
+        sprite.anchor.set(0.5);
+        sprite.x = entity.location.x;
+        sprite.y = entity.location.y;
+
+        otherPlayerSprites.addChild(sprite);
+      }
+    }
+  }
+
+  for (var loot of world.loot) {
+    sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Loot"]);
+    sprite.anchor.set(0.5);
+    sprite.x = loot.x;
+    sprite.y = loot.y;
+
+    if (collision(sprite, player)) {
+      increasePlayerHealth();
+      socket.emit("gotLoot", {
+        lootId: loot.id
+      });
+    }
+
+    lootSprites.addChild(sprite);
+  }
+
+  updatePlayersRemainingMessage()
+}
+
+function shotsFired(projectile) {
+  if (projectile.owner != player.id) {
+    registerProjectile(projectile)
+  }
+}
+
+function playerHit(msg) {
+  if (msg.playerId == player.id) {
+    reducePlayerHealth();
+  }
+}
+
 function setup() {
   document.body.appendChild(app.view);
 
@@ -178,14 +253,17 @@ function setup() {
 
   window.addEventListener("optimizedResize", function() {
     app.renderer.resize(window.innerWidth, window.innerHeight);
+    clearFogOfWar()
+    redrawFogOfWar()
   });
 
+  setupStage();
   renderInitialTiles();
 
   player = {
     initialized: false,
-    x: app.renderer.width / 2,
-    y: app.renderer.height / 2,
+    x: Math.floor(Math.random() * (MAP_SIZE - 4 * TILE_SIZE)) + (2 * TILE_SIZE),
+    y: Math.floor(Math.random() * (MAP_SIZE - 4 * TILE_SIZE)) + (2 * TILE_SIZE),
     vx: 0,
     vy: 0,
     id: Math.random().toString(),
@@ -195,81 +273,35 @@ function setup() {
     lastDirection: {x: 0, y: 1}
   }
 
-  app.stage.addChild(otherPlayerSprites);
-  app.stage.addChild(lootSprites);
-
-  overlayContainer = new PIXI.Container();
-  overlayContainer.width = window.innerWidth;
-  overlayContainer.height = window.innerHeight;
-  app.stage.addChild(overlayContainer);
-
   controls = setupControls();
   setupHealthBar()
   setupPlayersRemainingBar()
 
+
+  redrawFogOfWar();
+
   socket = io();
   socket.emit("announce", { name: player.id });
-  socket.on("worldUpdated", function(msg) {
-    otherPlayerSprites.children = [];
-    lootSprites.children = [];
 
-    world = msg;
-    for (var playerId in world.clients) {
-      var entity = world.clients[playerId];
-
-      if (entity.location) {
-        if (playerId == player.id) {
-          if(player.sprite === undefined) {
-            player.sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
-            player.sprite.anchor.set(0.5);
-            player.sprite.x = entity.location.x;
-            player.sprite.y = entity.location.y;
-
-            app.stage.addChild(player.sprite);
-          }
-        } else {
-          sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Blob"]);
-          sprite.anchor.set(0.5);
-          sprite.x = entity.location.x;
-          sprite.y = entity.location.y;
-
-          otherPlayerSprites.addChild(sprite);
-        }
-      }
-    }
-
-    for (var loot of world.loot) {
-      sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Loot"]);
-      sprite.anchor.set(0.5);
-      sprite.x = loot.x;
-      sprite.y = loot.y;
-
-      if (collision(sprite, player)) {
-        socket.emit("gotLoot", {
-          lootId: loot.id
-        });
-      }
-
-      lootSprites.addChild(sprite);
-    }
-
-    updatePlayersRemainingMessage()
-  });
-
-  socket.on("shotsFired", function(projectile) {
-    if (projectile.owner != player.id) {
-      registerProjectile(projectile)
-    }
-  });
-
-  socket.on("playerHit", function(msg) {
-    if (msg.playerId == player.id) {
-      reducePlayerHealth();
-    }
-  });
+  socket.on("worldUpdated", worldUpdated)
+  socket.on("shotsFired", shotsFired)
+  socket.on("playerHit", playerHit)
 
   state = play;
   gameLoop();
+}
+
+function setupStage() {
+  overlayContainer.width = window.innerWidth;
+  overlayContainer.height = window.innerHeight;
+
+  app.stage.addChild(tileContainer);
+  app.stage.addChild(otherPlayerSprites);
+  app.stage.addChild(lootSprites);
+  app.stage.addChild(currentPlayerContainer);
+  app.stage.addChild(projectileContainer);
+  app.stage.addChild(fogOfWarContainer);
+  app.stage.addChild(overlayContainer);
 }
 
 function gameLoop() {
@@ -279,7 +311,6 @@ function gameLoop() {
   state();
   app.renderer.render(app.stage);
 }
-
 
 function play() {
   calculatePlayerVelocity()
@@ -312,31 +343,7 @@ function play() {
         player.sprite.x = player.x;
         player.sprite.y = player.y;
 
-        if (outerFogOfWar === undefined) {
-          innerFogOfWar = new PIXI.Graphics();
-          innerFogOfWar.lineStyle(window.innerWidth / 7, 0x000000, 0.8);
-          innerFogOfWar.beginFill(0x000000, 0);
-          innerFogOfWar.drawCircle(0, 0, window.innerWidth / 3.5);
-          innerFogOfWar.endFill();
-          innerFogOfWar.x = player.x;
-          innerFogOfWar.y = player.y;
-          app.stage.addChild(innerFogOfWar);
-
-          outerFogOfWar = new PIXI.Graphics();
-          outerFogOfWar.lineStyle(window.innerWidth / 3, 0x000000, 1);
-          outerFogOfWar.beginFill(0x000000, 0.1);
-          outerFogOfWar.drawCircle(0, 0, window.innerWidth / 2);
-          outerFogOfWar.endFill();
-          outerFogOfWar.x = player.x;
-          outerFogOfWar.y = player.y;
-          app.stage.addChild(outerFogOfWar);
-
-        } else {
-          innerFogOfWar.x = player.x;
-          innerFogOfWar.y = player.y;
-          outerFogOfWar.x = player.x;
-          outerFogOfWar.y = player.y;
-        }
+        redrawFogOfWar()
       }
     }
 
@@ -361,6 +368,41 @@ function play() {
   })
 }
 
+function clearFogOfWar() {
+  fogOfWarContainer.children = []
+}
+
+function redrawFogOfWar() {
+  var baseSize = Math.max(window.innerWidth, window.innerHeight);
+
+  if (fogOfWarContainer.children.length == 0) {
+    if (baseSize > 640) {
+      innerFogOfWar = new PIXI.Graphics();
+      innerFogOfWar.lineStyle(baseSize / 7, 0x000000, 0.8);
+      innerFogOfWar.beginFill(0x000000, 0);
+      innerFogOfWar.drawCircle(0, 0, baseSize / 3.5);
+      innerFogOfWar.endFill();
+      innerFogOfWar.x = player.x;
+      innerFogOfWar.y = player.y;
+      fogOfWarContainer.addChild(innerFogOfWar);
+    }
+
+    outerFogOfWar = new PIXI.Graphics();
+    outerFogOfWar.lineStyle(baseSize / 3, 0x000000, 1);
+    outerFogOfWar.beginFill(0x000000, 0.1);
+    outerFogOfWar.drawCircle(0, 0, baseSize / 2);
+    outerFogOfWar.endFill();
+    outerFogOfWar.x = player.x;
+    outerFogOfWar.y = player.y;
+    fogOfWarContainer.addChild(outerFogOfWar);
+  } else {
+    innerFogOfWar.x = player.x;
+    innerFogOfWar.y = player.y;
+    outerFogOfWar.x = player.x;
+    outerFogOfWar.y = player.y;
+  }
+}
+
 function centreViewportOnPlayer() {
   var newX = app.renderer.screen.width / 2 - player.x;
   var newY = app.renderer.screen.height / 2 - player.y;
@@ -378,36 +420,45 @@ function renderInitialTiles() {
   var bottomLeftTileTexture = PIXI.utils.TextureCache["Bottom Left Tile"];
   var bottomRightTileTexture = PIXI.utils.TextureCache["Bottom Right Tile"];
   var bottomTileTexture = PIXI.utils.TextureCache["Bottom Tile"];
-  var standardTileTexture = PIXI.utils.TextureCache["Standard Tile"];
-  var tile = null;
+  var standardTileTexture = PIXI.utils.TextureCache["13x Standard Tile"];
 
-  for (var x = 0; x < mapSize; x += tileSize) {
-    for (var y = 0; y < mapSize; y += tileSize) {
+  for (var x = 0; x < MAP_SIZE; x += TILE_SIZE) {
+    for (var y = 0; y < MAP_SIZE; y += TILE_SIZE) {
+      var tile = undefined;
+
       if (x == 0 && y == 0) {
         var tile = new PIXI.Sprite(topLeftTileTexture);
-      } else if (y == 0 && x + tileSize >= mapSize) {
+      } else if (y == 0 && x + TILE_SIZE >= MAP_SIZE) {
         var tile = new PIXI.Sprite(topRightTileTexture);
-      } else if (y == 0) {
+      } else if (y == 0 && placeBigTile(x)) {
         var tile = new PIXI.Sprite(topTileTexture);
-      } else if (y + tileSize >= mapSize && x + tileSize >= mapSize) {
+      } else if (y + TILE_SIZE >= MAP_SIZE && x + TILE_SIZE >= MAP_SIZE) {
         var tile = new PIXI.Sprite(bottomRightTileTexture);
-      } else if (x + tileSize >= mapSize) {
+      } else if (x + TILE_SIZE >= MAP_SIZE && placeBigTile(undefined, y)) {
         var tile = new PIXI.Sprite(rightTileTexture);
-      } else if (x == 0 && y + tileSize >= mapSize) {
+      } else if (x == 0 && y + TILE_SIZE >= MAP_SIZE) {
         var tile = new PIXI.Sprite(bottomLeftTileTexture);
-      } else if (y + tileSize >= mapSize) {
+      } else if (y + TILE_SIZE >= MAP_SIZE && placeBigTile(x)) {
         var tile = new PIXI.Sprite(bottomTileTexture);
-      } else if (x == 0) {
+      } else if (x == 0 && placeBigTile(undefined, y)) {
         var tile = new PIXI.Sprite(leftTileTexture);
-      } else {
+      } else if (placeBigTile(x, y)) {
         var tile = new PIXI.Sprite(standardTileTexture);
       }
 
-      tile.x = x;
-      tile.y = y;
-      app.stage.addChild(tile);
+      if(tile !== undefined) {
+        tile.x = x;
+        tile.y = y;
+
+        tileContainer.addChild(tile);
+      }
     }
   }
+}
+
+function placeBigTile(x, y) {
+  return (x === undefined || ((x + TILE_SIZE * (TILES_IN_BIG_TILE - 1)) % (TILE_SIZE * TILES_IN_BIG_TILE) == 0))
+      && (y === undefined || (y + TILE_SIZE * (TILES_IN_BIG_TILE - 1)) % (TILE_SIZE * TILES_IN_BIG_TILE) == 0);
 }
 
 function registerProjectile({x, y, vx, vy, owner}) {
@@ -420,15 +471,15 @@ function registerProjectile({x, y, vx, vy, owner}) {
 
   sprite.anchor.set(0.5);
 
-  app.stage.addChild(sprite)
+  projectileContainer.addChild(sprite)
   projectiles.push(sprite)
 }
 
 function calculateProjectileFromPlayer() {
   var projectile = {vx: 0, vy: 0}
 
-  projectile.vx = player.lastDirection.x * projectileSpeed
-  projectile.vy = player.lastDirection.y * projectileSpeed
+  projectile.vx = player.lastDirection.x * PROJECTILE_SPEED
+  projectile.vy = player.lastDirection.y * PROJECTILE_SPEED
   projectile.x = player.x
   projectile.y = player.y
   projectile.owner = player.id
@@ -437,13 +488,13 @@ function calculateProjectileFromPlayer() {
 }
 
 function notifyServerOfShotFired(projectile) {
-    socket.emit('shotsFired', {
-      x: projectile.x,
-      y: projectile.y,
-      vx: projectile.vx,
-      vy: projectile.vy,
-      owner: player.id
-    })
+  socket.emit("shotsFired", {
+    x: projectile.x,
+    y: projectile.y,
+    vx: projectile.vx,
+    vy: projectile.vy,
+    owner: player.id
+  })
 }
 
 function tryShoot() {
@@ -463,8 +514,15 @@ function reducePlayerHealth() {
   }
 }
 
+function increasePlayerHealth() {
+  healthBar.outer.width += 32;
+  if (healthBar.outer.width > INITIAL_PLAYER_HEALTH) {
+    healthBar.outer.width = INITIAL_PLAYER_HEALTH;
+  }
+}
+
 function playerDead() {
-  healthBar.message.text = " ☠️ ";
+  healthBar.message.text = " \u2620 "; // SKULL AND CROSSBONES
   player.sprite.alpha = 0.4; // you're a ghost now!
   showDeathScreen();
   socket.emit("playerDead", { playerId: player.id });
@@ -482,16 +540,15 @@ function showDeathScreen() {
 }
 
 function isClippableAt(x, y) {
-  clippableSprites = ["Standard Tile"];
+  tileBounds = tileContainer.getBounds();
+  clippableBounds = new PIXI.Rectangle(
+    TILE_SIZE * 1.25,
+    TILE_SIZE * 0.75,
+    tileBounds.width - (2.5 * TILE_SIZE),
+    tileBounds.height - (2.25 * TILE_SIZE)
+  )
 
-  // the getChildAt simply gets the sprite at the array Index we give, we can
-  // calculate the array index from the given x and y values. The stage stores
-  // all of the sprites in a single array so we need to mutliple the y value by
-  // the offset of a row
-  calculatedIndex = Math.floor(x / tileSize) + (Math.floor(y / tileSize) * (mapSize / tileSize));
-  spriteName = app.stage.getChildAt(calculatedIndex).texture.textureCacheIds[0];
-
-  return clippableSprites.indexOf(spriteName) !== -1;
+  return clippableBounds.contains(x, y);
 }
 
 function collision(r1, r2) {
