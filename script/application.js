@@ -1,7 +1,8 @@
 const PLAYER_MOVEMENT_SPEED = 5;
 const PROJECTILE_SPEED = 20;
+const TILES_IN_BIG_TILE = 13;
 const TILE_SIZE = 32;
-const MAP_SIZE = TILE_SIZE * 64;  // 2048 x 2048 arena
+const MAP_SIZE = (TILE_SIZE * (TILES_IN_BIG_TILE * 10) + 2);  // (4162 x 4162) arena, change TILES_IN_BIG_TILE multiplier to alter size.
 
 var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0x222222 });
 var gameTick = 0;
@@ -409,37 +410,45 @@ function renderInitialTiles() {
   var bottomLeftTileTexture = PIXI.utils.TextureCache["Bottom Left Tile"];
   var bottomRightTileTexture = PIXI.utils.TextureCache["Bottom Right Tile"];
   var bottomTileTexture = PIXI.utils.TextureCache["Bottom Tile"];
-  var standardTileTexture = PIXI.utils.TextureCache["Standard Tile"];
-  var tile = null;
+  var standardTileTexture = PIXI.utils.TextureCache["13x Standard Tile"];
 
   for (var x = 0; x < MAP_SIZE; x += TILE_SIZE) {
     for (var y = 0; y < MAP_SIZE; y += TILE_SIZE) {
+      var tile = undefined;
+
       if (x == 0 && y == 0) {
         var tile = new PIXI.Sprite(topLeftTileTexture);
       } else if (y == 0 && x + TILE_SIZE >= MAP_SIZE) {
         var tile = new PIXI.Sprite(topRightTileTexture);
-      } else if (y == 0) {
+      } else if (y == 0 && placeBigTile(x)) {
         var tile = new PIXI.Sprite(topTileTexture);
       } else if (y + TILE_SIZE >= MAP_SIZE && x + TILE_SIZE >= MAP_SIZE) {
         var tile = new PIXI.Sprite(bottomRightTileTexture);
-      } else if (x + TILE_SIZE >= MAP_SIZE) {
+      } else if (x + TILE_SIZE >= MAP_SIZE && placeBigTile(undefined, y)) {
         var tile = new PIXI.Sprite(rightTileTexture);
       } else if (x == 0 && y + TILE_SIZE >= MAP_SIZE) {
         var tile = new PIXI.Sprite(bottomLeftTileTexture);
-      } else if (y + TILE_SIZE >= MAP_SIZE) {
+      } else if (y + TILE_SIZE >= MAP_SIZE && placeBigTile(x)) {
         var tile = new PIXI.Sprite(bottomTileTexture);
-      } else if (x == 0) {
+      } else if (x == 0 && placeBigTile(undefined, y)) {
         var tile = new PIXI.Sprite(leftTileTexture);
-      } else {
+      } else if (placeBigTile(x, y)) {
         var tile = new PIXI.Sprite(standardTileTexture);
       }
 
-      tile.x = x;
-      tile.y = y;
+      if(tile !== undefined) {
+        tile.x = x;
+        tile.y = y;
 
-      tileContainer.addChild(tile);
+        tileContainer.addChild(tile);
+      }
     }
   }
+}
+
+function placeBigTile(x, y) {
+  return (x === undefined || ((x + TILE_SIZE * (TILES_IN_BIG_TILE - 1)) % (TILE_SIZE * TILES_IN_BIG_TILE) == 0))
+      && (y === undefined || (y + TILE_SIZE * (TILES_IN_BIG_TILE - 1)) % (TILE_SIZE * TILES_IN_BIG_TILE) == 0);
 }
 
 function registerProjectile({x, y, vx, vy, owner}) {
