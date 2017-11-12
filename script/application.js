@@ -701,7 +701,7 @@ function main(playerId, worldData) {
   }
 
   function showRoundEnded(msg) {
-    text = `The game is over.\n${world.allPlayersCount} players are waiting for you\nto press the "R" key`
+    text = `The game is over.\n${world.allPlayersCount - 1} players are waiting for you\nto press the "R" key`
     if (msg.winner.id === player.id) {
       text = `Winner Winner Chicken Dinner!\n\n${text}`
     } else {
