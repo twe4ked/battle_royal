@@ -10,6 +10,8 @@ let DEV_MODE;
 let PLAYER_ID;
 let WORLD_SETUP = false;
 
+var playerName;
+
 function main(playerId, worldData) {
   PIXI.loader.add("assets/treasureHunter.json").load(setup);
 
@@ -39,7 +41,6 @@ function main(playerId, worldData) {
   var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0x006699 });
   var gameTick = 0;
   var player;
-  var playerName;
   var projectiles = [];
   var canShootNext = 0;
   var world = {};
@@ -363,7 +364,6 @@ function main(playerId, worldData) {
     renderInitialTiles();
 
     player = createPlayer();
-    getPlayerName();
     controls = setupControls();
     setupHealthBar()
     setupPlayersRemainingBar()
@@ -382,19 +382,6 @@ function main(playerId, worldData) {
 
     state = play;
     gameLoop();
-  }
-
-  function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1) + min)
-  }
-
-  function defaultName() {
-    return `PLAYERUNKNOWN #${getRandomInt(10000, 90000)}`
-  }
-
-  function getPlayerName() {
-    name = defaultName()
-    playerName = prompt("What's your name?", name) || name
   }
 
   function setupStage() {
@@ -843,6 +830,19 @@ function main(playerId, worldData) {
   }
 }
 
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function defaultName() {
+  return `PLAYERUNKNOWN #${getRandomInt(10000, 90000)}`
+}
+
+function getPlayerName() {
+  name = defaultName()
+  playerName = prompt("What's your name?", name) || name
+}
+
 document.addEventListener("DOMContentLoaded", function() {
   var playerId = Math.random().toString();
 
@@ -854,5 +854,7 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   });
 
-  socket.emit("announce", { id: playerId });
+  getPlayerName()
+
+  socket.emit("announce", { id: playerId, playerName });
 });

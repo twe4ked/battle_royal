@@ -149,7 +149,7 @@ io.on("connection", function(socket) {
       TILE_SIZE,
       MAP_SIZE,
       DEV_MODE,
-    }); 
+    });
   });
 
   socket.on("moved", function(locationMsg) {
