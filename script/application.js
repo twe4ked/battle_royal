@@ -262,7 +262,7 @@ function shotsFired(projectile) {
 
 function playerHit(msg) {
   if (msg.playerId == player.id) {
-    reducePlayerHealth();
+    reducePlayerHealth(msg);
   }
 }
 
@@ -350,7 +350,7 @@ function play() {
           Math.abs(projectile.y - world.clients[playerId].location.y) <=
           hitboxSize) {
         if(projectile.owner == player.id) {
-          socket.emit("playerHit", { reporterId: player.id, playerId: playerId });
+          socket.emit("playerHit", { reporterId: player.id, playerId: playerId, projectileOwner: projectile.owner });
         }
         projectile.vx = 0;
         projectile.vy = 0;
@@ -561,10 +561,10 @@ function tryShoot() {
   }
 }
 
-function reducePlayerHealth() {
+function reducePlayerHealth(msg) {
   healthBar.outer.width -= 32;
   if (healthBar.outer.width == 0) {
-    playerDead();
+    playerDead(msg);
   }
 }
 
@@ -575,11 +575,11 @@ function increasePlayerHealth() {
   }
 }
 
-function playerDead() {
+function playerDead(msg) {
   healthBar.message.text = " \u2620 "; // SKULL AND CROSSBONES
   player.sprite.alpha = 0.4; // you're a ghost now!
   showDeathScreen();
-  socket.emit("playerDead", { playerId: player.id });
+  socket.emit("playerDead", { playerId: player.id, projectileOwner: msg.projectileOwner });
 }
 
 function playerDeadCallback(msg) {
@@ -589,7 +589,7 @@ function playerDeadCallback(msg) {
 
   length = killfeedMessages.unshift({
     timer: 60 * 3,
-    text: `${msg.playerId} was killed with a ${weapon}`
+    text: `${msg.projectileOwner} killed ${msg.playerId} with a ${weapon}`
   })
   if (length > 6) {
     killfeedMessages.pop()
