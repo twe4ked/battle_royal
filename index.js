@@ -36,7 +36,8 @@ io.on("connection", function(socket) {
   });
 
   socket.on("moved", function(locationMsg) {
-    if (playerIsUnworthy(locationMsg.id)) { return }
+    player = clients[locationMsg.id]
+    if (player === undefined) { return }
 
     player.location = {
       x: locationMsg.x,
