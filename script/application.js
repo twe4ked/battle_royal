@@ -1,12 +1,10 @@
 // TODO:
 //
 //  - Lobby screen
-//  - Randomised spawns
 //  - End of game screen
 //  - Death circle
 //  - Names (JS prompt)
 //  - Add killer to killfeed
-//  - Sounds
 
 var devMode = (window.location.search.split("?")[1] == 'dev=true');
 
