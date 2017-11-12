@@ -39,7 +39,12 @@ function resetRound() {
 
 io.on("connection", function(socket) {
   socket.on("announce", function(player) {
-    clients[player.name] = { name: player.name, socket: socket.id, alive: false };
+    clients[player.name] = {
+      name: player.name,
+      socket: socket.id,
+      alive: false,
+      playerName: player.playerName
+    };
   });
 
   socket.on("moved", function(locationMsg) {
@@ -55,7 +60,6 @@ io.on("connection", function(socket) {
   socket.on("shotsFired", function(payload) {
     if (playerIsUnworthy(payload.owner)) { return }
 
-    console.log("Shot fired!", payload)
     io.emit("shotsFired", payload)
   });
 
@@ -88,7 +92,7 @@ io.on("connection", function(socket) {
     }
     clients = newClients
   });
-  
+
   socket.on("newRoundRequested", function() {
     resetRound()
   })

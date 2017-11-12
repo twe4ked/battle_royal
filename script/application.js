@@ -34,6 +34,7 @@ const SOUNDS = {
 var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0x006699 });
 var gameTick = 0;
 var player;
+var playerName;
 var projectiles = [];
 var canShootNext = 0;
 var world = {};
@@ -294,7 +295,8 @@ function createPlayer() {
     lastDirection: {x: 0, y: 1},
     alive: false,
     messageTimer: 0,
-    lastHitAt: -9999
+    lastHitAt: -9999,
+    name: "Unknown Player",
   }
 
   newPlayer.sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
@@ -304,7 +306,6 @@ function createPlayer() {
 
   currentPlayerContainer.children = []
   currentPlayerContainer.addChild(newPlayer.sprite)
-
 
   newPlayer.message = new PIXI.Text("", {fontFamily: "Futura", fontSize: "13px", fill: "white" });
   newPlayer.message.anchor.set(0.5);
@@ -362,7 +363,7 @@ function defaultName() {
 
 function getPlayerName() {
   name = defaultName()
-  player.name = prompt("What's your name?", name) || name
+  playerName = prompt("What's your name?", name) || name
 }
 
 function setupStage() {
@@ -401,7 +402,11 @@ function play() {
           Math.abs(projectile.y - world.clients[playerId].location.y) <= hitboxSize &&
           world.clients[playerId].alive) {
         if(projectile.owner == player.id) {
-          emitEvent("playerHit", { reporterId: player.id, playerId: playerId, projectileOwner: projectile.owner });
+          emitEvent("playerHit", {
+            reporterId: player.id,
+            playerId: playerId,
+            projectileOwnerName: world.clients[projectile.owner].playerName
+          });
         }
         projectile.vx = 0;
         projectile.vy = 0;
@@ -640,7 +645,10 @@ function playerDead(msg) {
   player.alive = false;
   healthBar.message.text = " \u2620 "; // SKULL AND CROSSBONES
   showDeathScreen();
-  emitEvent("playerDead", { playerId: player.id, projectileOwner: msg.projectileOwner });
+  emitEvent("playerDead", {
+    playerId: player.id,
+    projectileOwnerName: msg.projectileOwnerName
+  });
 }
 
 function shuffle(a) {
@@ -660,7 +668,7 @@ function playerDeadCallback(msg) {
 
   length = killfeedMessages.unshift({
     timer: 60 * 3,
-    text: `${msg.projectileOwner} killed ${msg.playerId} with a ${weapon}`
+    text: `${msg.projectileOwnerName} killed ${msg.playerName} with a ${weapon}`
   })
   if (length > 6) {
     killfeedMessages.pop()
@@ -762,7 +770,10 @@ function tryRestart() {
 }
 
 function emitEvent(name, msg) {
-  socket.emit(name, msg)
+  socket.emit(name, {
+    ...msg,
+    playerName: playerName,
+  })
 }
 
 document.addEventListener("DOMContentLoaded", main);
