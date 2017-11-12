@@ -4,6 +4,20 @@ var http = require("http").Server(app);
 var io = require("socket.io")(http);
 var port = process.env.PORT || 3000;
 var clients = {};
+var devMode = process.env.DEV == 'true';
+
+function tile_multiplier() {
+  if (devMode) {
+    return 1;
+  } else {
+    return 16;
+  }
+}
+
+const TILES_IN_BIG_TILE = 13;
+const TILE_SIZE = 32;
+const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * tile_multiplier()) + 2));
+const DEV_MODE = devMode;
 
 var deathCircle;
 
@@ -90,6 +104,12 @@ io.on("connection", function(socket) {
       alive: false,
       playerName: player.playerName
     };
+    io.emit("worldSettings", {
+      TILES_IN_BIG_TILE,
+      TILE_SIZE,
+      MAP_SIZE,
+      DEV_MODE,
+    }); 
   });
 
   socket.on("moved", function(locationMsg) {
