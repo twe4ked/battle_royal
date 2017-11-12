@@ -202,6 +202,11 @@ function worldUpdated(msg) {
           player.sprite.y = entity.location.y;
 
           currentPlayerContainer.addChild(player.sprite)
+
+          player.message = new PIXI.Text("", {fontFamily: "Futura", fontSize: "13px", fill: "white" });
+          player.message.anchor.set(0.5);
+          player.message.y = -32;
+          player.sprite.addChild(player.message);
         }
       } else {
         sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Blob"]);
@@ -222,6 +227,7 @@ function worldUpdated(msg) {
 
     if (collision(sprite, player)) {
       increasePlayerHealth();
+      addPlayerMessage("Picked up health!")
       socket.emit("gotLoot", {
         lootId: loot.id
       });
@@ -231,6 +237,11 @@ function worldUpdated(msg) {
   }
 
   updatePlayersRemainingMessage()
+}
+
+function addPlayerMessage(message) {
+  player.messageTimer = 60 * 2
+  player.message.text = message
 }
 
 function shotsFired(projectile) {
@@ -272,7 +283,8 @@ function setup() {
     width: PIXI.utils.TextureCache["Player"].width,
     height: PIXI.utils.TextureCache["Player"].height,
     direction: {x: 0, y: 0},
-    lastDirection: {x: 0, y: 1}
+    lastDirection: {x: 0, y: 1},
+    messageTimer: 0,
   }
 
   controls = setupControls();
@@ -316,6 +328,7 @@ function gameLoop() {
 
 function play() {
   calculatePlayerVelocity()
+  updateMessage()
 
   // Check if any projectiles have hit another player
   projectiles.forEach(function(projectile) {
@@ -368,6 +381,16 @@ function play() {
   projectiles = projectiles.filter(function(projectile) {
     return !(projectile.vx == 0 && projectile.vy == 0)
   })
+}
+
+function updateMessage() {
+  if (player.messageTimer > 0) {
+    player.messageTimer--
+  } else {
+    if (player.message) {
+      player.message.text = ""
+    }
+  }
 }
 
 function clearFogOfWar() {
