@@ -319,6 +319,7 @@ function setup() {
   renderInitialTiles();
 
   player = createPlayer();
+  getPlayerName();
   controls = setupControls();
   setupHealthBar()
   setupPlayersRemainingBar()
@@ -336,6 +337,19 @@ function setup() {
 
   state = play;
   gameLoop();
+}
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function defaultName() {
+  return `PLAYERUNKNOWN #${getRandomInt(10000, 90000)}`
+}
+
+function getPlayerName() {
+  name = defaultName()
+  player.name = prompt("What's your name?", name) || name
 }
 
 function setupStage() {
