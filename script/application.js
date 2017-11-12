@@ -203,6 +203,8 @@ function main(playerId, worldData) {
     box.addChild(playersList)
 
     playersListContainer.addChild(box)
+
+    playersListContainer.visible = !world.gameInProgress
   }
 
   function setupHealthBar() {
