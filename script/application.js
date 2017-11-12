@@ -13,7 +13,7 @@ const PLAYER_MOVEMENT_SPEED = 5;
 const PROJECTILE_SPEED = 20;
 const TILES_IN_BIG_TILE = 13;
 const TILE_SIZE = 32;
-const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * 16) + 2)); // (210 x 210 tile) arena, change TILES_IN_BIG_TILE multiplier to alter size.
+const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * 10) + 2)); // (132 x 132 tile) arena, change TILES_IN_BIG_TILE multiplier to alter size.
 const INITIAL_PLAYER_HEALTH = 128
 
 const SOUNDS = {
