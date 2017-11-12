@@ -32,6 +32,7 @@ function playerIsUnworthy(playerId) {
 io.on("connection", function(socket) {
   socket.on("announce", function(player) {
     clients[player.name] = { name: player.name, socket: socket.id, health: 5, alive: true };
+    socket.emit("roundStarted")
   });
 
   socket.on("moved", function(locationMsg) {
