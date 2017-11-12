@@ -102,8 +102,19 @@ function newLoot() {
   }
 }
 
+function newTree() {
+  return {
+    id: Math.random().toString(),
+    x: _.random((TILE_SIZE * 2), MAP_SIZE - (TILE_SIZE * 2)),
+    y: _.random((TILE_SIZE * 2), MAP_SIZE - (TILE_SIZE * 2)),
+  }
+}
+
 // TODO: `loot` should be a hash with the `id` as the key.
-var loot = _.times(10, function() { return newLoot(); });
+var loot = _.times(50, function() { return newLoot(); });
+
+// TODO: `trees` should scale according to map size
+var trees = _.times(500, function() { return newTree(); });
 
 app.get("*", function(req, res) {
   if (req.path === "/") {
@@ -222,6 +233,7 @@ setInterval(function() {
 
   io.emit("worldUpdated", {
     clients,
+    trees,
     loot,
     allPlayersCount: Object.keys(clients).length,
     playersRemainingCount: playersRemainingCount(),

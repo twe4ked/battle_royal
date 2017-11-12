@@ -47,6 +47,7 @@ function main(playerId, worldData) {
   var world = {};
   var otherPlayerSprites = new PIXI.Container();
   var lootSprites = new PIXI.Container();
+  var treeSprites = new PIXI.Container();
   var tileContainer = new PIXI.Container();
   var overlayContainer = new PIXI.Container();
   var fogOfWarContainer = new PIXI.Container();
@@ -286,6 +287,7 @@ function main(playerId, worldData) {
   function worldUpdated(msg) {
     otherPlayerSprites.children = [];
     lootSprites.children = [];
+    treeSprites.children = [];
 
     world = msg;
     for (var playerId in world.clients) {
@@ -320,6 +322,15 @@ function main(playerId, worldData) {
           lootId: loot.id
         });
       }
+
+      lootSprites.addChild(sprite);
+    }
+
+    for (var tree of world.trees) {
+      sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Tree"]);
+      sprite.anchor.set(0.5);
+      sprite.x = tree.x;
+      sprite.y = tree.y;
 
       lootSprites.addChild(sprite);
     }
@@ -437,6 +448,7 @@ function main(playerId, worldData) {
     app.stage.addChild(tileContainer);
     app.stage.addChild(otherPlayerSprites);
     app.stage.addChild(lootSprites);
+    app.stage.addChild(treeSprites);
     app.stage.addChild(currentPlayerContainer);
     app.stage.addChild(projectileContainer);
     app.stage.addChild(deathCircleContainer);
