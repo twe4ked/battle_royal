@@ -204,21 +204,7 @@ function worldUpdated(msg) {
     var entity = world.clients[playerId];
 
     if (entity.location) {
-      if (playerId == player.id) {
-        if(player.sprite === undefined) {
-          player.sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
-          player.sprite.anchor.set(0.5);
-          player.sprite.x = entity.location.x;
-          player.sprite.y = entity.location.y;
-
-          currentPlayerContainer.addChild(player.sprite)
-
-          player.message = new PIXI.Text("", {fontFamily: "Futura", fontSize: "13px", fill: "white" });
-          player.message.anchor.set(0.5);
-          player.message.y = -32;
-          player.sprite.addChild(player.message);
-        }
-      } else {
+      if (playerId != player.id) {
         sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Blob"]);
         sprite.anchor.set(0.5);
         sprite.x = entity.location.x;
@@ -235,7 +221,7 @@ function worldUpdated(msg) {
     sprite.x = loot.x;
     sprite.y = loot.y;
 
-    if (collision(sprite, player)) {
+    if (player.alive && collision(sprite, player)) {
       increasePlayerHealth();
       addPlayerMessage("Picked up health!")
       socket.emit("gotLoot", {
@@ -266,6 +252,46 @@ function playerHit(msg) {
   }
 }
 
+function randomLocationOnMap() {
+  return {
+    x: Math.floor(Math.random() * (MAP_SIZE - 4 * TILE_SIZE)) + (2 * TILE_SIZE),
+    y: Math.floor(Math.random() * (MAP_SIZE - 4 * TILE_SIZE)) + (2 * TILE_SIZE),
+  }
+}
+
+function createPlayer() {
+  var newPlayer = {
+    ...randomLocationOnMap(),
+    initialized: false,
+    vx: 0,
+    vy: 0,
+    id: Math.random().toString(),
+    width: PIXI.utils.TextureCache["Player"].width,
+    height: PIXI.utils.TextureCache["Player"].height,
+    direction: {x: 0, y: 0},
+    lastDirection: {x: 0, y: 1},
+    alive: false,
+    messageTimer: 0,
+    lastHitAt: -9999
+  }
+
+  newPlayer.sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
+  newPlayer.sprite.anchor.set(0.5);
+  newPlayer.sprite.x = newPlayer.x;
+  newPlayer.sprite.y = newPlayer.y;
+
+  currentPlayerContainer.children = []
+  currentPlayerContainer.addChild(newPlayer.sprite)
+
+
+  newPlayer.message = new PIXI.Text("", {fontFamily: "Futura", fontSize: "13px", fill: "white" });
+  newPlayer.message.anchor.set(0.5);
+  newPlayer.message.y = -32;
+  newPlayer.sprite.addChild(newPlayer.message);
+
+  return newPlayer
+}
+
 function setup() {
   document.body.appendChild(app.view);
 
@@ -283,21 +309,7 @@ function setup() {
   setupStage();
   renderInitialTiles();
 
-  player = {
-    initialized: false,
-    x: Math.floor(Math.random() * (MAP_SIZE - 4 * TILE_SIZE)) + (2 * TILE_SIZE),
-    y: Math.floor(Math.random() * (MAP_SIZE - 4 * TILE_SIZE)) + (2 * TILE_SIZE),
-    vx: 0,
-    vy: 0,
-    id: Math.random().toString(),
-    width: PIXI.utils.TextureCache["Player"].width,
-    height: PIXI.utils.TextureCache["Player"].height,
-    direction: {x: 0, y: 0},
-    lastDirection: {x: 0, y: 1},
-    messageTimer: 0,
-    lastHitAt: -9999
-  }
-
+  player = createPlayer();
   controls = setupControls();
   setupHealthBar()
   setupPlayersRemainingBar()
@@ -306,12 +318,12 @@ function setup() {
   redrawFogOfWar();
 
   socket = io();
-  socket.emit("announce", { name: player.id });
-
+  socket.on("roundStarted", roundStarted)
   socket.on("worldUpdated", worldUpdated)
   socket.on("shotsFired", shotsFired)
   socket.on("playerHit", playerHit)
   socket.on("playerDead", playerDeadCallback)
+  socket.emit("announce", { name: player.id });
 
   state = play;
   gameLoop();
@@ -554,7 +566,7 @@ function notifyServerOfShotFired(projectile) {
 }
 
 function tryShoot() {
-  if (canShootNext <= gameTick) {
+  if (player.alive && canShootNext <= gameTick) {
     projectile = calculateProjectileFromPlayer()
     registerProjectile(projectile)
     notifyServerOfShotFired(projectile)
@@ -579,8 +591,8 @@ function increasePlayerHealth() {
 }
 
 function playerDead(msg) {
+  player.alive = false;
   healthBar.message.text = " \u2620 "; // SKULL AND CROSSBONES
-  player.sprite.alpha = 0.4; // you're a ghost now!
   showDeathScreen();
   socket.emit("playerDead", { playerId: player.id, projectileOwner: msg.projectileOwner });
 }
@@ -608,6 +620,17 @@ function showDeathScreen() {
   message.x = 120;
   message.y = (app.screen.height - 180);
   overlayContainer.addChild(message);
+}
+
+function roundStarted() {
+  player = {
+    ...createPlayer(),
+    id: player.id,
+    alive: true,
+  }
+
+  clearFogOfWar()
+  redrawFogOfWar()
 }
 
 function isClippableAt(x, y) {
