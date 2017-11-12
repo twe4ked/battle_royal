@@ -1,3 +1,11 @@
+// TODO:
+//
+//  - Lobby screen
+//  - Randomised spawns
+//  - End of game screen
+//  - Death circle
+//  - Names (JS prompt)
+
 const PLAYER_MOVEMENT_SPEED = 5;
 const PROJECTILE_SPEED = 20;
 const TILES_IN_BIG_TILE = 13;
