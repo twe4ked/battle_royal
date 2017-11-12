@@ -5,6 +5,42 @@ var io = require("socket.io")(http);
 var port = process.env.PORT || 3000;
 var clients = {};
 
+var deathCircle;
+
+function DeathCircle(x, y, radius) {
+  const PAUSED_MS = 5000
+  const ACTIVE_MS = 2000
+  const INITIAL_RADIUS = 300 // units of some kind?
+  const INITIAL_X = 50 // units of some kind?
+  const INITIAL_Y = 50 // units of some kind?
+  const SHRINK_RATIO = 0.8
+
+  x = x || INITIAL_X
+  y = y || INITIAL_Y
+  radius = radius || INITIAL_RADIUS
+
+  var upcomingCircle;
+  var calculateUpcomingCircle = () => {
+    if (upcomingCircle === undefined) {
+      upcomingCircle = new DeathCircle(x, y, radius * SHRINK_RATIO)
+    }
+
+    return upcomingCircle
+  }
+
+  var currentDimensions = () => {
+    return {x: x, y: y, radius: radius}
+  }
+
+  return {
+    x,
+    y,
+    radius,
+    upcomingCircle: calculateUpcomingCircle,
+    currentDimensions,
+  }
+}
+
 function newLoot() {
   return {
     id: Math.random().toString(),
@@ -34,6 +70,7 @@ function resetRound() {
     clients[client_id].alive = true
   }
 
+  deathCircle = new DeathCircle()
   io.emit("roundStarted")
 }
 
@@ -122,9 +159,12 @@ setInterval(function() {
     allPlayersCount: Object.keys(clients).length,
     playersRemainingCount: playersRemainingCount(),
     gameInProgress,
+    deathCircle: deathCircle.currentDimensions(),
+    upcomingCircle: deathCircle.upcomingCircle().currentDimensions(),
   });
 }, 1000 / 60);
 
 http.listen(port, function() {
-  console.log("listening on *:" + port);
-});
+  resetRound()
+  console.log("listening on *:" + port)
+})
