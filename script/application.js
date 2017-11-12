@@ -16,6 +16,11 @@ const TILE_SIZE = 32;
 const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * 16) + 2)); // (210 x 210 tile) arena, change TILES_IN_BIG_TILE multiplier to alter size.
 const INITIAL_PLAYER_HEALTH = 128
 
+const SOUNDS = {
+  pewpew: new Audio('/assets/pewpew.m4a'),
+  ouch: new Audio('/assets/ouch.m4a')
+}
+
 var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0x006699 });
 var gameTick = 0;
 var player;
@@ -555,6 +560,8 @@ function calculateProjectileFromPlayer() {
   projectile.y = player.y
   projectile.owner = player.id
 
+  SOUNDS.pewpew.play()
+
   return projectile
 }
 
@@ -579,6 +586,7 @@ function tryShoot() {
 }
 
 function reducePlayerHealth(msg) {
+  SOUNDS.ouch.play();
   player.lastHitAt = gameTick;
   healthBar.outer.width -= 32;
   if (healthBar.outer.width == 0) {
