@@ -694,11 +694,20 @@ function main(playerId, worldData) {
   }
 
   function updateDeathCircles() {
+    window.deathCircle = deathCircle
+    window.player = player
     deathCircle.clear()
     deathCircle.lineStyle(DEATH_CIRCLE_LINE_THICKNESS, DEATH_CIRCLE_COLOUR, 1)
 
     if (world.deathCircle !== undefined) {
       deathCircle.drawCircle(world.deathCircle.x, world.deathCircle.y, world.deathCircle.radius)
+
+      if(!deathCircle.getBounds().contains(player.sprite.getBounds().x, player.sprite.getBounds().y)) {
+        reducePlayerHealth({
+          playerId: PLAYER_ID,
+          projectileOwnerName: player.name
+        })
+      }
     }
 
     upcomingDeathCircle.clear()
@@ -707,17 +716,21 @@ function main(playerId, worldData) {
     if (world.upcomingDeathCircle !== undefined) {
       upcomingDeathCircle.drawCircle(world.upcomingDeathCircle.x, world.upcomingDeathCircle.y, world.upcomingDeathCircle.radius)
     }
+
+
   }
 
   function reducePlayerHealth(msg) {
-    player.lastHitAt = gameTick;
-    if (player.health > 0) { player.health -= 1 }
+    if(player.alive) {
+      player.lastHitAt = gameTick;
+      if (player.health > 0) { player.health -= 1 }
 
-    if (player.health == 0) {
-      SOUNDS.death_sound.play();
-      playerDead(msg);
-    } else {
-      SOUNDS.ouch.play();
+      if (player.health == 0) {
+        SOUNDS.death_sound.play();
+        playerDead(msg);
+      } else {
+        SOUNDS.ouch.play();
+      }
     }
   }
 

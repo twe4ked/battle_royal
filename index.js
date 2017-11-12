@@ -186,10 +186,12 @@ io.on("connection", function(socket) {
     io.emit("playerDead", msg);
 
     if (playersRemainingCount() <= 1) {
-      playersRemaining()[0].chicken_dinners++
+      if (playersRemaining()[0] !== undefined) {
+        playersRemaining()[0].chicken_dinners++
+      }
 
       io.emit("roundEnded", {
-        winner: playersRemaining()[0]
+        winner: playersRemaining()[0] || "No one"
       })
     }
   });
