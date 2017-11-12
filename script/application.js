@@ -52,6 +52,7 @@ function main(playerId, worldData) {
   var currentPlayerContainer = new PIXI.Container();
   var projectileContainer = new PIXI.Container();
   var deathCircleContainer = new PIXI.Container();
+  var playersListContainer = new PIXI.Container()
   var healthBar;
   var playersRemainingMessage;
   var hitboxSize = TILE_SIZE / 2;
@@ -63,7 +64,7 @@ function main(playerId, worldData) {
   var overlayMessage;
   var deathCircle;
   var upcomingDeathCircle;
-
+  var playersList;
 
   var throttle = function(type, name, obj) {
     obj = obj || window;
@@ -162,6 +163,46 @@ function main(playerId, worldData) {
     overlayMessage.y = app.screen.height / 2
 
     overlayContainer.addChild(overlayMessage)
+  }
+
+  function setupPlayersList() {
+    updatePlayersList([])
+
+    overlayContainer.addChild(playersListContainer)
+  }
+
+  function updatePlayersList(clients) {
+    playersListContainer.removeChildren()
+
+    playersListContainer.x = 10
+    playersListContainer.y = 41
+
+    if (playersList === undefined) {
+      playersList = new PIXI.Text("", {fontFamily: "Futura", fontSize: "13px", fill: "white", background: "black"})
+      playersList.x = 10
+      playersList.y = 10
+    }
+
+    names = []
+    for (var id in clients) {
+      client = clients[id]
+
+      name = client.playerName
+      if (client.chicken_dinners > 0) {
+        name += ` (${client.chicken_dinners})`
+      }
+
+      names.push(name)
+    }
+    playersList.text = names.join("\n")
+
+    var box = new PIXI.Graphics();
+    box.beginFill(0x333333);
+    box.drawRect(0, 0, playersList.width + 20, playersList.height + 20);
+    box.endFill();
+    box.addChild(playersList)
+
+    playersListContainer.addChild(box)
   }
 
   function setupHealthBar() {
@@ -281,6 +322,7 @@ function main(playerId, worldData) {
     }
 
     updatePlayersRemainingMessage()
+    updatePlayersList(world.clients)
   }
 
   function roundEnded(msg) {
@@ -370,6 +412,7 @@ function main(playerId, worldData) {
     setupKillfeed()
     setupDeathCircles()
     setupOverlayMessage()
+    setupPlayersList()
     redrawFogOfWar();
     showIntroText()
 
