@@ -26,6 +26,9 @@ function main(playerId, worldData) {
   const INITIAL_PLAYER_HEALTH = 4
   const HEALTH_BAR_SCALING = 128
   const YOU_DED = "YOU DED\nBETTER LUCK NEXT TIME!"
+  const DEATH_CIRCLE_COLOUR = 0xFF0000
+  const UPCOMING_DEATH_CIRCLE_COLOUR = 0x00FF00
+  const DEATH_CIRCLE_LINE_THICKNESS = 5
 
   const SOUNDS = {
     pewpew: new Audio('/assets/pewpew.m4a'),
@@ -47,6 +50,7 @@ function main(playerId, worldData) {
   var fogOfWarContainer = new PIXI.Container();
   var currentPlayerContainer = new PIXI.Container();
   var projectileContainer = new PIXI.Container();
+  var deathCircleContainer = new PIXI.Container();
   var healthBar;
   var playersRemainingMessage;
   var hitboxSize = TILE_SIZE / 2;
@@ -56,6 +60,9 @@ function main(playerId, worldData) {
   var killfeedMessages = [];
   var killfeed;
   var overlayMessage;
+  var deathCircle;
+  var upcomingDeathCircle;
+
 
   var throttle = function(type, name, obj) {
     obj = obj || window;
@@ -192,6 +199,14 @@ function main(playerId, worldData) {
     if (world.playersRemainingCount === undefined) { return; }
 
     playersRemainingMessage.text = `Players Remaining: ${world.playersRemainingCount}`
+  }
+
+  function setupDeathCircles() {
+    deathCircle = new PIXI.Graphics();
+    deathCircleContainer.addChild(deathCircle)
+
+    upcomingDeathCircle = new PIXI.Graphics();
+    deathCircleContainer.addChild(upcomingDeathCircle)
   }
 
   function setupPlayersRemainingBar() {
@@ -353,6 +368,7 @@ function main(playerId, worldData) {
     setupHealthBar()
     setupPlayersRemainingBar()
     setupKillfeed()
+    setupDeathCircles()
     setupOverlayMessage()
     redrawFogOfWar();
     showIntroText()
@@ -391,6 +407,7 @@ function main(playerId, worldData) {
     app.stage.addChild(currentPlayerContainer);
     app.stage.addChild(projectileContainer);
     app.stage.addChild(fogOfWarContainer);
+    app.stage.addChild(deathCircleContainer);
     app.stage.addChild(overlayContainer);
   }
 
@@ -409,6 +426,7 @@ function main(playerId, worldData) {
     updateHealthBar()
     pulsatePlayerSprite()
     ghostifyPlayerSprite()
+    updateDeathCircles()
 
     // Check if any projectiles have hit another player
     projectiles.forEach(function(projectile) {
@@ -641,6 +659,23 @@ function main(playerId, worldData) {
 
   function updateHealthBar() {
     healthBar.outer.width = HEALTH_BAR_SCALING * (player.health / player.maxHealth)
+  }
+
+  function updateDeathCircles() {
+    return // WIP, almost finished!
+    deathCircle.clear()
+    deathCircle.lineStyle(DEATH_CIRCLE_LINE_THICKNESS, DEATH_CIRCLE_COLOUR, 1)
+
+    if (world.deathCircle !== undefined) {
+      deathCircle.drawCircle(world.deathCircle.x, world.deathCircle.y, world.deathCircle.radius)
+    }
+
+    upcomingDeathCircle.clear()
+    upcomingDeathCircle.lineStyle(DEATH_CIRCLE_LINE_THICKNESS, UPCOMING_DEATH_CIRCLE_COLOUR, 1)
+
+    if (world.upcomingDeathCircle !== undefined) {
+      upcomingDeathCircle.drawCircle(world.upcomingDeathCircle.x, world.upcomingDeathCircle.y, world.upcomingDeathCircle.radius)
+    }
   }
 
   function reducePlayerHealth(msg) {

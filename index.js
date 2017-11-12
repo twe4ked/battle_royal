@@ -198,7 +198,7 @@ setInterval(function() {
     playersRemainingCount: playersRemainingCount(),
     gameInProgress,
     deathCircle: deathCircle.currentDimensions(),
-    upcomingCircle: deathCircle.upcomingCircle().currentDimensions(),
+    upcomingDeathCircle: deathCircle.upcomingCircle().currentDimensions(),
   });
 }, 1000 / SERVER_HZ);
 
