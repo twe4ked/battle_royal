@@ -262,8 +262,8 @@ function setup() {
 
   player = {
     initialized: false,
-    x: app.renderer.width / 2,
-    y: app.renderer.height / 2,
+    x: Math.floor(Math.random() * (MAP_SIZE - 4 * TILE_SIZE)) + (2 * TILE_SIZE),
+    y: Math.floor(Math.random() * (MAP_SIZE - 4 * TILE_SIZE)) + (2 * TILE_SIZE),
     vx: 0,
     vy: 0,
     id: Math.random().toString(),
