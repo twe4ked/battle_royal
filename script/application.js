@@ -8,13 +8,23 @@
 //  - Add killer to killfeed
 //  - Sounds
 
+var devMode = (window.location.search.split("?")[1] == 'dev=true');
+
+function tile_multiplier() {
+  if (devMode) {
+    return 1;
+  } else {
+    return 16;
+  }
+}
+
 const GHOST_ALPHA = 0.6;
 const GHOST_TINT = 0x888855;
 const PLAYER_MOVEMENT_SPEED = 5;
 const PROJECTILE_SPEED = 20;
 const TILES_IN_BIG_TILE = 13;
 const TILE_SIZE = 32;
-const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * 10) + 2)); // (132 x 132 tile) arena, change TILES_IN_BIG_TILE multiplier to alter size.
+const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * tile_multiplier()) + 2)); // (default tile multiplier: 16 (210 x 210 tile arena). Change TILES_IN_BIG_TILE multiplier to alter size.
 const INITIAL_PLAYER_HEALTH = 128
 
 const SOUNDS = {
@@ -470,6 +480,10 @@ function clearFogOfWar() {
 }
 
 function redrawFogOfWar() {
+  if (devMode) {
+    return;
+  }
+
   var baseSize = Math.max(window.innerWidth, window.innerHeight);
 
   if (fogOfWarContainer.children.length == 0) {
