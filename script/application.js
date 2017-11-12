@@ -600,10 +600,20 @@ function playerDead(msg) {
   socket.emit("playerDead", { playerId: player.id, projectileOwner: msg.projectileOwner });
 }
 
+function shuffle(a) {
+  var j, x, i;
+  for (i = a.length - 1; i > 0; i--) {
+    j = Math.floor(Math.random() * (i + 1));
+    x = a[i];
+    a[i] = a[j];
+    a[j] = x;
+  }
+}
+
 function playerDeadCallback(msg) {
-  weapon = ["Crossbow", "M16A2", "SCAR-L", "AWM", "M24", "Groza", "Pan!"].sort(function() {
-    return Math.random() > 0.5
-  })[0]
+  weapons = ["Crossbow", "M16A2", "SCAR-L", "AWM", "M24", "Groza", "Pan!"]
+  shuffle(weapons)
+  weapon = weapons[0]
 
   length = killfeedMessages.unshift({
     timer: 60 * 3,
