@@ -10,7 +10,7 @@ function tile_multiplier() {
   if (devMode) {
     return 1;
   } else {
-    return 16;
+    return 10;
   }
 }
 
