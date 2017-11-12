@@ -233,7 +233,7 @@ function worldUpdated(msg) {
     if (player.alive && collision(sprite, player)) {
       increasePlayerHealth();
       addPlayerMessage("Picked up health!")
-      socket.emit("gotLoot", {
+      emitEvent("gotLoot", {
         lootId: loot.id
       });
     }
@@ -333,7 +333,7 @@ function setup() {
   socket.on("shotsFired", shotsFired)
   socket.on("playerHit", playerHit)
   socket.on("playerDead", playerDeadCallback)
-  socket.emit("announce", { name: player.id });
+  emitEvent("announce", { name: player.id });
 
   state = play;
   gameLoop();
@@ -388,7 +388,7 @@ function play() {
           Math.abs(projectile.y - world.clients[playerId].location.y) <= hitboxSize &&
           world.clients[playerId].alive) {
         if(projectile.owner == player.id) {
-          socket.emit("playerHit", { reporterId: player.id, playerId: playerId, projectileOwner: projectile.owner });
+          emitEvent("playerHit", { reporterId: player.id, playerId: playerId, projectileOwner: projectile.owner });
         }
         projectile.vx = 0;
         projectile.vy = 0;
@@ -412,7 +412,7 @@ function play() {
       }
     }
 
-    socket.emit("moved", { id: player.id, x: player.x, y: player.y });
+    emitEvent("moved", { id: player.id, x: player.x, y: player.y });
   }
 
   // Move projectiles that are in motion
@@ -582,7 +582,7 @@ function calculateProjectileFromPlayer() {
 }
 
 function notifyServerOfShotFired(projectile) {
-  socket.emit("shotsFired", {
+  emitEvent("shotsFired", {
     x: projectile.x,
     y: projectile.y,
     vx: projectile.vx,
@@ -621,7 +621,7 @@ function playerDead(msg) {
   player.alive = false;
   healthBar.message.text = " \u2620 "; // SKULL AND CROSSBONES
   showDeathScreen();
-  socket.emit("playerDead", { playerId: player.id, projectileOwner: msg.projectileOwner });
+  emitEvent("playerDead", { playerId: player.id, projectileOwner: msg.projectileOwner });
 }
 
 function shuffle(a) {
@@ -736,8 +736,12 @@ function pulsatePlayerSprite() {
 
 function tryRestart() {
   if (world.gameInProgress !== true ) {
-    socket.emit("newRoundRequested")
+    emitEvent("newRoundRequested")
   }
+}
+
+function emitEvent(name, msg) {
+  socket.emit(name, msg)
 }
 
 document.addEventListener("DOMContentLoaded", main);
