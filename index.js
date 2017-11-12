@@ -91,11 +91,12 @@ io.on("connection", function(socket) {
   });
 
   socket.on("disconnect", function() {
-    console.log(`Disconnecting ${socket.id}`)
     var newClients = {}
     for (var client_id in clients) {
       if (clients[client_id].socket != socket.id) {
         newClients[client_id] = clients[client_id]
+      } else {
+        console.log(`Disconnecting "${clients[client_id].playerName}" (${socket.id})`)
       }
     }
     clients = newClients
