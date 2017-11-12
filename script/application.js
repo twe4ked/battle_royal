@@ -1,6 +1,6 @@
 // TODO:
 //
-//  - End of game screen
+//  - Show "showRoundEnded" message when joining
 //  - Death circle
 
 var devMode = (window.location.search.split("?")[1] == 'dev=true');
@@ -22,6 +22,7 @@ const TILE_SIZE = 32;
 const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * tile_multiplier()) + 2)); // (default tile multiplier: 16 (210 x 210 tile arena). Change TILES_IN_BIG_TILE multiplier to alter size.
 const INITIAL_PLAYER_HEALTH = 4
 const HEALTH_BAR_SCALING = 128
+const YOU_DED = "YOU DED\nBETTER LUCK NEXT TIME!"
 
 const SOUNDS = {
   pewpew: new Audio('/assets/pewpew.m4a'),
@@ -265,7 +266,10 @@ function worldUpdated(msg) {
   }
 
   updatePlayersRemainingMessage()
-  if (world.gameInProgress !== true) { showRoundEnded() }
+}
+
+function roundEnded(msg) {
+  showRoundEnded(msg)
 }
 
 function addPlayerMessage(message) {
@@ -360,6 +364,7 @@ function setup() {
   socket.on("shotsFired", shotsFired)
   socket.on("playerHit", playerHit)
   socket.on("playerDead", playerDeadCallback)
+  socket.on("roundEnded", roundEnded)
   emitEvent("announce", { id: player.id });
 
   state = play;
@@ -691,8 +696,14 @@ function playerDeadCallback(msg) {
   }
 }
 
-function showRoundEnded() {
-  overlayMessage.text = `The game is over.\n${world.allPlayersCount} players are waiting for you\nto press the "R" key`
+function showRoundEnded(msg) {
+  text = `The game is over.\n${world.allPlayersCount} players are waiting for you\nto press the "R" key`
+  if (msg.winner.id === player.id) {
+    text = `Winner Winner Chicken Dinner!\n\n${text}`
+  } else {
+    text = `${YOU_DED}\n\n${text}`
+  }
+  overlayMessage.text = text
   overlayMessage.visible = true
 }
 

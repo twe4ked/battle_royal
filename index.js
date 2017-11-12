@@ -37,8 +37,12 @@ function resetRound() {
   io.emit("roundStarted")
 }
 
+function playersRemaining() {
+  return _.filter(clients, (client) => (client.alive))
+}
+
 function playersRemainingCount() {
-  return _.filter(clients, (client) => (client.alive)).length
+  return playersRemaining().length
 }
 
 io.on("connection", function(socket) {
@@ -86,7 +90,9 @@ io.on("connection", function(socket) {
     io.emit("playerDead", msg);
 
     if (playersRemainingCount() <= 1) {
-      io.emit("roundEnded")
+      io.emit("roundEnded", {
+        winner: playersRemaining()[0]
+      })
     }
   });
 
