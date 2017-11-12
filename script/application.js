@@ -8,6 +8,7 @@
 //  - Add killer to killfeed
 //  - Sounds
 
+const GHOST_ALPHA = 0.4;
 const PLAYER_MOVEMENT_SPEED = 5;
 const PROJECTILE_SPEED = 20;
 const TILES_IN_BIG_TILE = 13;
@@ -209,6 +210,7 @@ function worldUpdated(msg) {
         sprite.anchor.set(0.5);
         sprite.x = entity.location.x;
         sprite.y = entity.location.y;
+        if (!entity.alive) { sprite.alpha = GHOST_ALPHA }
 
         otherPlayerSprites.addChild(sprite);
       }
@@ -354,15 +356,16 @@ function play() {
   calculatePlayerVelocity()
   updateMessage()
   updateKillfeed()
-  pulsatePlayerSprite();
+  pulsatePlayerSprite()
+  ghostifyPlayerSprite()
 
   // Check if any projectiles have hit another player
   projectiles.forEach(function(projectile) {
     for (var playerId in world.clients) {
       if (playerId != projectile.owner && Math.abs(projectile.x -
             world.clients[playerId].location.x) <= hitboxSize &&
-          Math.abs(projectile.y - world.clients[playerId].location.y) <=
-          hitboxSize) {
+          Math.abs(projectile.y - world.clients[playerId].location.y) <= hitboxSize &&
+          world.clients[playerId].alive) {
         if(projectile.owner == player.id) {
           socket.emit("playerHit", { reporterId: player.id, playerId: playerId, projectileOwner: projectile.owner });
         }
@@ -654,9 +657,22 @@ function collision(r1, r2) {
   );
 }
 
+function ghostifyPlayerSprite() {
+  if (player.isPulsating) { return }
+
+  if (player.alive) {
+    player.sprite.alpha = 1
+  } else {
+    player.sprite.alpha = GHOST_ALPHA
+  }
+}
+
 function pulsatePlayerSprite() {
+  player.isPulsating = false
+
   if (player.sprite !== undefined) {
     if ((player.lastHitAt + 60) > gameTick) {
+      player.isPulsating = true
 
       pulseTints = [0xffffff, 0xffcccc, 0xff9999, 0xff6666, 0xff3333, 0xff0000, 0xff3300, 0xff6600, 0xff9900, 0xffffcc, 0xffff00, 0xffff33, 0xffff66, 0xffff99, 0xffffdd];
       pulseAlpha = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95];
