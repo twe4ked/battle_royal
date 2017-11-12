@@ -70,8 +70,8 @@ function DeathCircle(x, y, radius) {
 function newLoot() {
   return {
     id: Math.random().toString(),
-    x: _.random(0, 2047),
-    y: _.random(0, 2047),
+    x: _.random((TILE_SIZE * 2), MAP_SIZE - (TILE_SIZE * 2)),
+    y: _.random((TILE_SIZE * 2), MAP_SIZE - (TILE_SIZE * 2)),
   }
 }
 
@@ -143,7 +143,6 @@ io.on("connection", function(socket) {
 
   socket.on("gotLoot", function(payload) {
     newLoots = _.reject(loot, function(l) { return l.id === payload.lootId })
-    newLoots.unshift(newLoot())
     loot = newLoots
   })
 
