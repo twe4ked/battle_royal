@@ -22,12 +22,12 @@ const DEV_MODE = devMode;
 var deathCircle;
 
 function DeathCircle(x, y, radius) {
-  const PAUSED_MS = 12000
-  const ACTIVE_MS = 4000
-  const INITIAL_RADIUS = 1.3 * (MAP_SIZE / 2)
+  const PAUSED_MS = 16000
+  const ACTIVE_MS = 6000
+  const INITIAL_RADIUS = 1.6 * (MAP_SIZE / 2)
   const INITIAL_X = MAP_SIZE / 2
   const INITIAL_Y = MAP_SIZE / 2
-  const SHRINK_RATIO = 0.7
+  const SHRINK_RATIO = 0.8
 
   x = x || INITIAL_X
   y = y || INITIAL_Y
