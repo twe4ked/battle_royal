@@ -20,7 +20,8 @@ const PROJECTILE_SPEED = 20;
 const TILES_IN_BIG_TILE = 13;
 const TILE_SIZE = 32;
 const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * tile_multiplier()) + 2)); // (default tile multiplier: 16 (210 x 210 tile arena). Change TILES_IN_BIG_TILE multiplier to alter size.
-const INITIAL_PLAYER_HEALTH = 128
+const INITIAL_PLAYER_HEALTH = 4
+const HEALTH_BAR_SCALING = 128
 
 const SOUNDS = {
   pewpew: new Audio('/assets/pewpew.m4a'),
@@ -170,7 +171,7 @@ function setupHealthBar() {
   //Create the front red rectangle
   var outerBar = new PIXI.Graphics();
   outerBar.beginFill(0xFF3300);
-  outerBar.drawRect(1, 1, INITIAL_PLAYER_HEALTH, 20);
+  outerBar.drawRect(1, 1, HEALTH_BAR_SCALING * (player.health / player.maxHealth), 20);
   outerBar.endFill();
   healthBar.addChild(outerBar);
   message = new PIXI.Text(
@@ -306,6 +307,8 @@ function createPlayer() {
     messageTimer: 0,
     lastHitAt: -9999,
     name: "Unknown Player",
+    health: INITIAL_PLAYER_HEALTH,
+    maxHealth: INITIAL_PLAYER_HEALTH,
   }
 
   newPlayer.sprite = new PIXI.Sprite(PIXI.utils.TextureCache["Player"]);
@@ -401,6 +404,7 @@ function play() {
   calculatePlayerVelocity()
   updateMessage()
   updateKillfeed()
+  updateHealthBar()
   pulsatePlayerSprite()
   ghostifyPlayerSprite()
 
@@ -633,10 +637,15 @@ function tryShoot() {
   }
 }
 
+function updateHealthBar() {
+  healthBar.outer.width = HEALTH_BAR_SCALING * (player.health / player.maxHealth)
+}
+
 function reducePlayerHealth(msg) {
   player.lastHitAt = gameTick;
-  healthBar.outer.width -= 32;
-  if (healthBar.outer.width == 0) {
+  if (player.health > 0) { player.health -= 1 }
+
+  if (player.health == 0) {
     SOUNDS.death_sound.play();
     playerDead(msg);
   } else {
@@ -645,10 +654,7 @@ function reducePlayerHealth(msg) {
 }
 
 function increasePlayerHealth() {
-  healthBar.outer.width += 32;
-  if (healthBar.outer.width > INITIAL_PLAYER_HEALTH) {
-    healthBar.outer.width = INITIAL_PLAYER_HEALTH;
-  }
+  if (player.health < player.maxHealth) { player.health += 1 }
 }
 
 function playerDead(msg) {
@@ -705,6 +711,7 @@ function roundStarted() {
   clearFogOfWar()
   redrawFogOfWar()
   overlayMessage.visible = false
+  healthBar.message.text = "Health"
 }
 
 function isClippableAt(x, y) {
