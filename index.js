@@ -33,7 +33,9 @@ function DeathCircle(x, y, radius) {
   y = y || INITIAL_Y
   radius = radius || INITIAL_RADIUS
 
+  var elapsed_ms = 0;
   var upcomingCircle;
+
   var calculateUpcomingCircle = () => {
     if (upcomingCircle === undefined) {
       upcomingCircle = new DeathCircle(x, y, radius * SHRINK_RATIO)
@@ -46,12 +48,22 @@ function DeathCircle(x, y, radius) {
     return {x: x, y: y, radius: radius}
   }
 
+  var tick = (time_ms) => {
+    elapsed_ms += time_ms
+  }
+
+  var expired = () => {
+    return elapsed_ms > (PAUSED_MS + ACTIVE_MS)
+  }
+
   return {
     x,
     y,
     radius,
     upcomingCircle: calculateUpcomingCircle,
     currentDimensions,
+    tick,
+    expired,
   }
 }
 
@@ -173,8 +185,12 @@ io.on("connection", function(socket) {
   })
 });
 
+SERVER_HZ = 60
 setInterval(function() {
   let gameInProgress = playersRemainingCount() > 1
+
+  deathCircle.tick(1000 / SERVER_HZ)
+  if (deathCircle.expired()) { deathCircle = deathCircle.upcomingCircle() }
 
   io.emit("worldUpdated", {
     clients,
@@ -185,7 +201,7 @@ setInterval(function() {
     deathCircle: deathCircle.currentDimensions(),
     upcomingCircle: deathCircle.upcomingCircle().currentDimensions(),
   });
-}, 1000 / 60);
+}, 1000 / SERVER_HZ);
 
 http.listen(port, function() {
   resetRound()
