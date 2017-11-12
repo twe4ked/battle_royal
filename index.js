@@ -24,9 +24,9 @@ var deathCircle;
 function DeathCircle(x, y, radius) {
   const PAUSED_MS = 5000
   const ACTIVE_MS = 2000
-  const INITIAL_RADIUS = 300 // units of some kind?
-  const INITIAL_X = 50 // units of some kind?
-  const INITIAL_Y = 50 // units of some kind?
+  const INITIAL_RADIUS = MAP_SIZE / 2
+  const INITIAL_X = MAP_SIZE / 2
+  const INITIAL_Y = MAP_SIZE / 2
   const SHRINK_RATIO = 0.8
 
   x = x || INITIAL_X
@@ -44,8 +44,25 @@ function DeathCircle(x, y, radius) {
     return upcomingCircle
   }
 
+  var interpolate = (oldDimensions, newDimensions, progression) => {
+    x_diff = newDimensions.x - oldDimensions.x
+    y_diff = newDimensions.y - oldDimensions.y
+    radius_diff = newDimensions.radius - oldDimensions.radius
+
+    return {
+      x: oldDimensions.x + x_diff * progression,
+      y: oldDimensions.y + y_diff * progression,
+      radius: oldDimensions.radius + radius_diff * progression,
+    }
+  }
+
   var currentDimensions = () => {
-    return {x: x, y: y, radius: radius}
+    oldDimensions = {x, y, radius}
+    if (elapsed_ms < PAUSED_MS) {
+      return oldDimensions
+    } else {
+      return interpolate(oldDimensions, upcomingCircle.currentDimensions(), (elapsed_ms - PAUSED_MS) / ACTIVE_MS)
+    }
   }
 
   var tick = (time_ms) => {
