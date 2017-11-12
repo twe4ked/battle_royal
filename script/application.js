@@ -5,6 +5,8 @@
 //  - End of game screen
 //  - Death circle
 //  - Names (JS prompt)
+//  - Killfeed
+//  - Sounds
 
 const PLAYER_MOVEMENT_SPEED = 5;
 const PROJECTILE_SPEED = 20;
