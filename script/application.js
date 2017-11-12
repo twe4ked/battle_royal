@@ -295,6 +295,7 @@ function setup() {
     direction: {x: 0, y: 0},
     lastDirection: {x: 0, y: 1},
     messageTimer: 0,
+    lastHitAt: -9999
   }
 
   controls = setupControls();
@@ -341,6 +342,7 @@ function play() {
   calculatePlayerVelocity()
   updateMessage()
   updateKillfeed()
+  pulsatePlayerSprite();
 
   // Check if any projectiles have hit another player
   projectiles.forEach(function(projectile) {
@@ -562,6 +564,7 @@ function tryShoot() {
 }
 
 function reducePlayerHealth(msg) {
+  player.lastHitAt = gameTick;
   healthBar.outer.width -= 32;
   if (healthBar.outer.width == 0) {
     playerDead(msg);
@@ -626,6 +629,36 @@ function collision(r1, r2) {
     r1.y < r2.y + r2.height &&
     r1.height + r1.y > r2.y
   );
+}
+
+function pulsatePlayerSprite() {
+  if (player.sprite !== undefined) {
+    if ((player.lastHitAt + 60) > gameTick) {
+
+      pulseTints = [0xffffff, 0xffcccc, 0xff9999, 0xff6666, 0xff3333, 0xff0000, 0xff3300, 0xff6600, 0xff9900, 0xffffcc, 0xffff00, 0xffff33, 0xffff66, 0xffff99, 0xffffdd];
+      pulseAlpha = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95];
+      var currentTintIndex, currentAlphaIndex;
+
+      currentTintIndex = pulseTints.indexOf(player.sprite.tint);
+
+      if (currentTintIndex < pulseTints.length - 1) {
+        player.sprite.tint = pulseTints[currentTintIndex + 1];
+      } else {
+        player.sprite.tint = pulseTints[0]
+      }
+
+      currentAlphaIndex = pulseAlpha.indexOf(player.sprite.alpha);
+
+      if (currentAlphaIndex < pulseAlpha.length - 1) {
+        player.sprite.alpha = pulseAlpha[currentAlphaIndex + 1];
+      } else {
+        player.sprite.alpha = pulseAlpha[0]
+      }
+    } else {
+      player.sprite.tint = 0xffffff;
+      player.sprite.alpha = 1;
+    }
+  }
 }
 
 document.addEventListener("DOMContentLoaded", main);
