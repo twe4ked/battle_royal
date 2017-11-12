@@ -9,6 +9,7 @@ let MAP_SIZE;
 let DEV_MODE;
 let PLAYER_ID;
 let WORLD_SETUP = false;
+let UNKNOWN_PLAYER_NAME = "Unknown Player";
 
 var playerName;
 
@@ -369,7 +370,7 @@ function main(playerId, worldData) {
       alive: false,
       messageTimer: 0,
       lastHitAt: -9999,
-      name: "Unknown Player",
+      name: UNKNOWN_PLAYER_NAME,
       health: INITIAL_PLAYER_HEALTH,
       maxHealth: INITIAL_PLAYER_HEALTH,
     }
@@ -763,9 +764,15 @@ function main(playerId, worldData) {
     shuffle(weapons)
     weapon = weapons[0]
 
+    if(msg.playerName == UNKNOWN_PLAYER_NAME) {
+      text = `${msg.projectileOwnerName} killed ${msg.playerName} with a ${weapon}`
+    } else {
+      text = `${msg.playerName} was killed by the death wall`
+    }
+
     length = killfeedMessages.unshift({
       timer: 60 * 5,
-      text: `${msg.projectileOwnerName} killed ${msg.playerName} with a ${weapon}`
+      text: text
     })
     if (length > 6) {
       killfeedMessages.pop()
