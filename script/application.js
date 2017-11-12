@@ -8,7 +8,8 @@
 //  - Add killer to killfeed
 //  - Sounds
 
-const GHOST_ALPHA = 0.4;
+const GHOST_ALPHA = 0.6;
+const GHOST_TINT = 0x888855;
 const PLAYER_MOVEMENT_SPEED = 5;
 const PROJECTILE_SPEED = 20;
 const TILES_IN_BIG_TILE = 13;
@@ -218,7 +219,10 @@ function worldUpdated(msg) {
         sprite.anchor.set(0.5);
         sprite.x = entity.location.x;
         sprite.y = entity.location.y;
-        if (!entity.alive) { sprite.alpha = GHOST_ALPHA }
+        if (!entity.alive) {
+          sprite.alpha = GHOST_ALPHA
+          sprite.tint = GHOST_TINT
+        }
 
         otherPlayerSprites.addChild(sprite);
       }
@@ -699,8 +703,10 @@ function ghostifyPlayerSprite() {
 
   if (player.alive) {
     player.sprite.alpha = 1
+    player.sprite.tint = 0xffffff;
   } else {
     player.sprite.alpha = GHOST_ALPHA
+    player.sprite.tint = GHOST_TINT
   }
 }
 
