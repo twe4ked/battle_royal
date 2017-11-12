@@ -3,6 +3,7 @@ const PROJECTILE_SPEED = 20;
 const TILES_IN_BIG_TILE = 13;
 const TILE_SIZE = 32;
 const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * 16) + 2)); // (210 x 210 tile) arena, change TILES_IN_BIG_TILE multiplier to alter size.
+const INITIAL_PLAYER_HEALTH = 128
 
 var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0x006699 });
 var gameTick = 0;
@@ -130,7 +131,7 @@ function setupHealthBar() {
   //Create the front red rectangle
   var outerBar = new PIXI.Graphics();
   outerBar.beginFill(0xFF3300);
-  outerBar.drawRect(1, 1, 128, 20);
+  outerBar.drawRect(1, 1, INITIAL_PLAYER_HEALTH, 20);
   outerBar.endFill();
   healthBar.addChild(outerBar);
   message = new PIXI.Text(
@@ -210,6 +211,7 @@ function worldUpdated(msg) {
     sprite.y = loot.y;
 
     if (collision(sprite, player)) {
+      increasePlayerHealth();
       socket.emit("gotLoot", {
         lootId: loot.id
       });
@@ -501,6 +503,13 @@ function reducePlayerHealth() {
   healthBar.outer.width -= 32;
   if (healthBar.outer.width == 0) {
     playerDead();
+  }
+}
+
+function increasePlayerHealth() {
+  healthBar.outer.width += 32;
+  if (healthBar.outer.width > INITIAL_PLAYER_HEALTH) {
+    healthBar.outer.width = INITIAL_PLAYER_HEALTH;
   }
 }
 
