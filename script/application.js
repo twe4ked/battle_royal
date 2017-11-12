@@ -4,7 +4,6 @@
 //  - End of game screen
 //  - Death circle
 //  - Names (JS prompt)
-//  - Add killer to killfeed
 
 var devMode = (window.location.search.split("?")[1] == 'dev=true');
 
