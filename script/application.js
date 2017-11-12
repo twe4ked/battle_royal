@@ -776,10 +776,10 @@ function main(playerId, worldData) {
     shuffle(weapons)
     weapon = weapons[0]
 
-    if(msg.playerName == UNKNOWN_PLAYER_NAME) {
+    if(msg.playerName != UNKNOWN_PLAYER_NAME) {
       text = `${msg.projectileOwnerName} killed ${msg.playerName} with a ${weapon}`
     } else {
-      text = `${msg.playerName} was killed by the death wall`
+      text = `${msg.playerName} was killed by the death circle`
     }
 
     length = killfeedMessages.unshift({
