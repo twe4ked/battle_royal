@@ -43,8 +43,8 @@ function playersRemainingCount() {
 
 io.on("connection", function(socket) {
   socket.on("announce", function(player) {
-    clients[player.name] = {
-      name: player.name,
+    clients[player.id] = {
+      id: player.id,
       socket: socket.id,
       alive: false,
       playerName: player.playerName

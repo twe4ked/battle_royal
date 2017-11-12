@@ -360,7 +360,7 @@ function setup() {
   socket.on("shotsFired", shotsFired)
   socket.on("playerHit", playerHit)
   socket.on("playerDead", playerDeadCallback)
-  emitEvent("announce", { name: player.id });
+  emitEvent("announce", { id: player.id });
 
   state = play;
   gameLoop();
