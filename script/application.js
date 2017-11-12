@@ -148,10 +148,11 @@ function calculatePlayerVelocity() {
 }
 
 function setupOverlayMessage() {
-  overlayMessage = new PIXI.Text("", {fontSize: "32", fontFamily: "Comic Sans MS", fill: "white"});
+  overlayMessage = new PIXI.Text("", {fontSize: "32px", fontFamily: "Comic Sans MS", fill: "white", align: "center"});
 
-  overlayMessage.x = 120
-  overlayMessage.y = (app.screen.height - 180)
+  overlayMessage.anchor.set(0.5)
+  overlayMessage.x = app.screen.width / 2
+  overlayMessage.y = app.screen.height / 2
 
   overlayContainer.addChild(overlayMessage)
 }
