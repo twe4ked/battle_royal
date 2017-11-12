@@ -4,7 +4,7 @@ const TILES_IN_BIG_TILE = 13;
 const TILE_SIZE = 32;
 const MAP_SIZE = (TILE_SIZE * ((TILES_IN_BIG_TILE * 16) + 2));  // (210 x 210 tile) arena, change TILES_IN_BIG_TILE multiplier to alter size.
 
-var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0x222222 });
+var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0x006699 });
 var gameTick = 0;
 var player;
 var projectiles = [];
