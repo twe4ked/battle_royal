@@ -18,7 +18,8 @@ const INITIAL_PLAYER_HEALTH = 128
 
 const SOUNDS = {
   pewpew: new Audio('/assets/pewpew.m4a'),
-  ouch: new Audio('/assets/ouch.m4a')
+  ouch: new Audio('/assets/ouch.m4a'),
+  death_sound: new Audio('/assets/death_sound.m4a')
 }
 
 var app = new PIXI.Application(MAP_SIZE, MAP_SIZE, { backgroundColor: 0x006699 });
@@ -602,11 +603,13 @@ function tryShoot() {
 }
 
 function reducePlayerHealth(msg) {
-  SOUNDS.ouch.play();
   player.lastHitAt = gameTick;
   healthBar.outer.width -= 32;
   if (healthBar.outer.width == 0) {
+    SOUNDS.death_sound.play();
     playerDead(msg);
+  } else {
+    SOUNDS.ouch.play();
   }
 }
 
