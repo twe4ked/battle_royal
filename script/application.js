@@ -683,7 +683,7 @@ function playerDeadCallback(msg) {
   weapon = weapons[0]
 
   length = killfeedMessages.unshift({
-    timer: 60 * 3,
+    timer: 60 * 5,
     text: `${msg.projectileOwnerName} killed ${msg.playerName} with a ${weapon}`
   })
   if (length > 6) {
