@@ -100,10 +100,12 @@ function setupControls() {
     aKey: keyboard(65),
     wKey: keyboard(87),
     dKey: keyboard(68),
-    sKey: keyboard(83)
+    sKey: keyboard(83),
+    rKey: keyboard(82)
   }
 
   controls.spaceKey.press = tryShoot;
+  controls.rKey.press = tryRestart;
 
   return controls;
 }
@@ -718,8 +720,10 @@ function pulsatePlayerSprite() {
   }
 }
 
-function requestNewRound() {
-  socket.emit("newRoundRequested")
+function tryRestart() {
+  if (world.gameInProgress !== true ) {
+    socket.emit("newRoundRequested")
+  }
 }
 
 document.addEventListener("DOMContentLoaded", main);
