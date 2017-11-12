@@ -5,7 +5,7 @@
 //  - End of game screen
 //  - Death circle
 //  - Names (JS prompt)
-//  - Killfeed
+//  - Add killer to killfeed
 //  - Sounds
 
 const PLAYER_MOVEMENT_SPEED = 5;
@@ -34,6 +34,8 @@ var hitboxSize = TILE_SIZE / 2;
 var controls;
 var outerFogOfWar;
 var innerFogOfWar;
+var killfeedMessages = [];
+var killfeed;
 
 var throttle = function(type, name, obj) {
   obj = obj || window;
@@ -185,6 +187,14 @@ function setupPlayersRemainingBar() {
   overlayContainer.addChild(bar)
 }
 
+function setupKillfeed() {
+  killfeed = new PIXI.Text("", {fontFamily: "Futura", fontSize: "13px", fill: "white" });
+  killfeed.x = 20;
+  killfeed.y = (app.screen.height - 120);
+
+  overlayContainer.addChild(killfeed)
+}
+
 function worldUpdated(msg) {
   otherPlayerSprites.children = [];
   lootSprites.children = [];
@@ -290,7 +300,7 @@ function setup() {
   controls = setupControls();
   setupHealthBar()
   setupPlayersRemainingBar()
-
+  setupKillfeed()
 
   redrawFogOfWar();
 
@@ -300,6 +310,7 @@ function setup() {
   socket.on("worldUpdated", worldUpdated)
   socket.on("shotsFired", shotsFired)
   socket.on("playerHit", playerHit)
+  socket.on("playerDead", playerDeadCallback)
 
   state = play;
   gameLoop();
@@ -329,6 +340,7 @@ function gameLoop() {
 function play() {
   calculatePlayerVelocity()
   updateMessage()
+  updateKillfeed()
 
   // Check if any projectiles have hit another player
   projectiles.forEach(function(projectile) {
@@ -381,6 +393,23 @@ function play() {
   projectiles = projectiles.filter(function(projectile) {
     return !(projectile.vx == 0 && projectile.vy == 0)
   })
+}
+
+function updateKillfeed() {
+  newKillfeedMessages = []
+  for (var message of killfeedMessages) {
+    if (message.timer > 0) {
+      message.timer--
+      newKillfeedMessages.push(message)
+    }
+  }
+  killfeedMessages = newKillfeedMessages
+
+  text = ""
+  for (var message of killfeedMessages) {
+    text += `${message.text}\n`
+  }
+  killfeed.text = text
 }
 
 function updateMessage() {
@@ -551,6 +580,20 @@ function playerDead() {
   player.sprite.alpha = 0.4; // you're a ghost now!
   showDeathScreen();
   socket.emit("playerDead", { playerId: player.id });
+}
+
+function playerDeadCallback(msg) {
+  weapon = ["Crossbow", "M16A2", "SCAR-L", "AWM", "M24", "Groza", "Pan!"].sort(function() {
+    return Math.random() > 0.5
+  })[0]
+
+  length = killfeedMessages.unshift({
+    timer: 60 * 3,
+    text: `${msg.playerId} was killed with a ${weapon}`
+  })
+  if (length > 6) {
+    killfeedMessages.pop()
+  }
 }
 
 function showDeathScreen() {
