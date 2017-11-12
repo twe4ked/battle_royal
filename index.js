@@ -37,6 +37,10 @@ function resetRound() {
   io.emit("roundStarted")
 }
 
+function playersRemainingCount() {
+  return _.filter(clients, (client) => (client.alive)).length
+}
+
 io.on("connection", function(socket) {
   socket.on("announce", function(player) {
     clients[player.name] = {
@@ -80,6 +84,10 @@ io.on("connection", function(socket) {
     clients[msg.playerId].health = 0;
     clients[msg.playerId].alive = false;
     io.emit("playerDead", msg);
+
+    if (playersRemainingCount() <= 1) {
+      io.emit("roundEnded")
+    }
   });
 
   socket.on("disconnect", function() {
@@ -99,13 +107,13 @@ io.on("connection", function(socket) {
 });
 
 setInterval(function() {
-  let playersRemainingCount = _.filter(clients, (client) => (client.alive)).length
-  let gameInProgress = playersRemainingCount > 1
+  let gameInProgress = playersRemainingCount() > 1
 
   io.emit("worldUpdated", {
     clients,
     loot,
-    playersRemainingCount,
+    allPlayersCount: Object.keys(clients).length,
+    playersRemainingCount: playersRemainingCount(),
     gameInProgress,
   });
 }, 1000 / 60);

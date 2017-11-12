@@ -52,6 +52,7 @@ var outerFogOfWar;
 var innerFogOfWar;
 var killfeedMessages = [];
 var killfeed;
+var overlayMessage;
 
 var throttle = function(type, name, obj) {
   obj = obj || window;
@@ -144,6 +145,15 @@ function calculatePlayerVelocity() {
 
   player.vx = PLAYER_MOVEMENT_SPEED * player.direction.x
   player.vy = PLAYER_MOVEMENT_SPEED * player.direction.y
+}
+
+function setupOverlayMessage() {
+  overlayMessage = new PIXI.Text("", {fontSize: "32", fontFamily: "Comic Sans MS", fill: "white"});
+
+  overlayMessage.x = 120
+  overlayMessage.y = (app.screen.height - 180)
+
+  overlayContainer.addChild(overlayMessage)
 }
 
 function setupHealthBar() {
@@ -255,6 +265,7 @@ function worldUpdated(msg) {
   }
 
   updatePlayersRemainingMessage()
+  if (world.gameInProgress !== true) { showRoundEnded() }
 }
 
 function addPlayerMessage(message) {
@@ -337,6 +348,7 @@ function setup() {
   setupHealthBar()
   setupPlayersRemainingBar()
   setupKillfeed()
+  setupOverlayMessage()
 
   redrawFogOfWar();
 
@@ -674,15 +686,14 @@ function playerDeadCallback(msg) {
   }
 }
 
-function showDeathScreen() {
-  message = new PIXI.Text(
-    "YOU DED\n" + "BETTER LUCK NEXT TIME!",
-    {fontSize: "64px", fontFamily: "Comic Sans MS", fill: "white"}
-  );
+function showRoundEnded() {
+  overlayMessage.text = `The game is over.\n${world.allPlayersCount} players are waiting for you\nto press the "R" key`
+  overlayMessage.visible = true
+}
 
-  message.x = 120;
-  message.y = (app.screen.height - 180);
-  overlayContainer.addChild(message);
+function showDeathScreen() {
+  overlayMessage.text = `YOU DED\nBETTER LUCK NEXT TIME!`
+  overlayMessage.visible = true
 }
 
 function roundStarted() {
@@ -694,6 +705,7 @@ function roundStarted() {
 
   clearFogOfWar()
   redrawFogOfWar()
+  overlayMessage.visible = false
 }
 
 function isClippableAt(x, y) {
