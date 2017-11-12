@@ -438,8 +438,8 @@ function main(playerId, worldData) {
     app.stage.addChild(lootSprites);
     app.stage.addChild(currentPlayerContainer);
     app.stage.addChild(projectileContainer);
-    app.stage.addChild(fogOfWarContainer);
     app.stage.addChild(deathCircleContainer);
+    app.stage.addChild(fogOfWarContainer);
     app.stage.addChild(overlayContainer);
   }
 
