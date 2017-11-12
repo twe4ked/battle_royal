@@ -102,7 +102,8 @@ io.on("connection", function(socket) {
       id: player.id,
       socket: socket.id,
       alive: false,
-      playerName: player.playerName
+      playerName: player.playerName,
+      chicken_dinners: 0
     };
     io.emit("worldSettings", {
       TILES_IN_BIG_TILE,
@@ -147,6 +148,8 @@ io.on("connection", function(socket) {
     io.emit("playerDead", msg);
 
     if (playersRemainingCount() <= 1) {
+      playersRemaining()[0].chicken_dinners++
+
       io.emit("roundEnded", {
         winner: playersRemaining()[0]
       })
