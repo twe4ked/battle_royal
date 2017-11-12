@@ -727,8 +727,6 @@ function main(playerId, worldData) {
     if (world.upcomingDeathCircle !== undefined) {
       upcomingDeathCircle.drawCircle(world.upcomingDeathCircle.x, world.upcomingDeathCircle.y, world.upcomingDeathCircle.radius)
     }
-
-
   }
 
   function reducePlayerHealth(msg) {
