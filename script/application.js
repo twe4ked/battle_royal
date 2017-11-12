@@ -707,8 +707,6 @@ function main(playerId, worldData) {
   }
 
   function updateDeathCircles() {
-    window.deathCircle = deathCircle
-    window.player = player
     deathCircle.clear()
     deathCircle.lineStyle(DEATH_CIRCLE_LINE_THICKNESS, DEATH_CIRCLE_COLOUR, 1)
 
