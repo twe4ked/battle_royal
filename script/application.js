@@ -123,7 +123,7 @@ function setupHealthBar() {
 
   //Create the black background rectangle
   var innerBar = new PIXI.Graphics();
-  innerBar.beginFill(0x000000);
+  innerBar.beginFill(0x666666);
   innerBar.drawRect(0, 0, 130, 22);
   innerBar.endFill();
   healthBar.addChild(innerBar);
@@ -159,7 +159,7 @@ function setupPlayersRemainingBar() {
   bar.position.set(300, 10)
 
   var innerBar = new PIXI.Graphics();
-  innerBar.beginFill(0x000000);
+  innerBar.beginFill(0x666666);
   innerBar.drawRect(0, 0, 130, 22);
   innerBar.endFill();
   bar.addChild(innerBar);
