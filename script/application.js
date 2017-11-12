@@ -1,9 +1,7 @@
 // TODO:
 //
-//  - Lobby screen
 //  - End of game screen
 //  - Death circle
-//  - Names (JS prompt)
 
 var devMode = (window.location.search.split("?")[1] == 'dev=true');
 
