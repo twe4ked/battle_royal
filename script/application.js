@@ -354,8 +354,8 @@ function main(playerId, worldData) {
     setupPlayersRemainingBar()
     setupKillfeed()
     setupOverlayMessage()
-
     redrawFogOfWar();
+    showIntroText()
 
     socket.on("roundStarted", roundStarted)
     socket.on("worldUpdated", worldUpdated)
@@ -691,6 +691,13 @@ function main(playerId, worldData) {
     if (length > 6) {
       killfeedMessages.pop()
     }
+  }
+
+  function showIntroText() {
+    text = `Welcome to Battle Royale!\n The next round will start shortly, sit tight.`
+
+    overlayMessage.text = text
+    overlayMessage.visible = true
   }
 
   function showRoundEnded(msg) {
