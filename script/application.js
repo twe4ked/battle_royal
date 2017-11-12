@@ -710,4 +710,8 @@ function pulsatePlayerSprite() {
   }
 }
 
+function requestNewRound() {
+  socket.emit("newRoundRequested")
+}
+
 document.addEventListener("DOMContentLoaded", main);

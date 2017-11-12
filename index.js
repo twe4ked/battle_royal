@@ -29,10 +29,17 @@ function playerIsUnworthy(playerId) {
   return (player === undefined || player.alive !== true)
 }
 
+function resetRound() {
+  for (var client_id in clients) {
+    clients[client_id].alive = true
+  }
+
+  io.emit("roundStarted")
+}
+
 io.on("connection", function(socket) {
   socket.on("announce", function(player) {
-    clients[player.name] = { name: player.name, socket: socket.id, health: 5, alive: true };
-    socket.emit("roundStarted")
+    clients[player.name] = { name: player.name, socket: socket.id, alive: false };
   });
 
   socket.on("moved", function(locationMsg) {
@@ -81,15 +88,21 @@ io.on("connection", function(socket) {
     }
     clients = newClients
   });
+  
+  socket.on("newRoundRequested", function() {
+    resetRound()
+  })
 });
 
 setInterval(function() {
   let playersRemainingCount = _.filter(clients, (client) => (client.alive)).length
+  let gameInProgress = playersRemainingCount > 1
 
   io.emit("worldUpdated", {
     clients,
     loot,
     playersRemainingCount,
+    gameInProgress,
   });
 }, 1000 / 60);
 
