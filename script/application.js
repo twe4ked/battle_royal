@@ -662,7 +662,6 @@ function main(playerId, worldData) {
   }
 
   function updateDeathCircles() {
-    return
     deathCircle.clear()
     deathCircle.lineStyle(DEATH_CIRCLE_LINE_THICKNESS, DEATH_CIRCLE_COLOUR, 1)
 

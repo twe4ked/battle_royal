@@ -22,12 +22,12 @@ const DEV_MODE = devMode;
 var deathCircle;
 
 function DeathCircle(x, y, radius) {
-  const PAUSED_MS = 5000
-  const ACTIVE_MS = 2000
-  const INITIAL_RADIUS = MAP_SIZE / 2
+  const PAUSED_MS = 12000
+  const ACTIVE_MS = 4000
+  const INITIAL_RADIUS = 1.3 * (MAP_SIZE / 2)
   const INITIAL_X = MAP_SIZE / 2
   const INITIAL_Y = MAP_SIZE / 2
-  const SHRINK_RATIO = 0.8
+  const SHRINK_RATIO = 0.7
 
   x = x || INITIAL_X
   y = y || INITIAL_Y
@@ -38,7 +38,17 @@ function DeathCircle(x, y, radius) {
 
   var calculateUpcomingCircle = () => {
     if (upcomingCircle === undefined) {
-      upcomingCircle = new DeathCircle(x, y, radius * SHRINK_RATIO)
+      upcomingRadius = radius * SHRINK_RATIO
+      min_x = (x - radius + upcomingRadius)
+      max_x = (x + radius - upcomingRadius)
+      min_y = (y - radius + upcomingRadius)
+      max_y = (y + radius - upcomingRadius)
+
+      upcomingCircle = new DeathCircle(
+        _.random(min_x, max_x),
+        _.random(min_y, max_y),
+        upcomingRadius,
+      )
     }
 
     return upcomingCircle
