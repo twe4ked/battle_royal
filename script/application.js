@@ -1,8 +1,3 @@
-// TODO:
-//
-//  - Show "showRoundEnded" message when joining
-//  - Death circle
-
 let TILES_IN_BIG_TILE;
 let TILE_SIZE;
 let MAP_SIZE;
