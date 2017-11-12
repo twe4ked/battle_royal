@@ -53,7 +53,15 @@
     "sourceSize": {"w":32,"h":32},
     "pivot": {"x":0.5,"y":0.5}
   },
-
+  "Tree":
+  {
+    "frame": {"x":153,"y":2,"w":32,"h":32},
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+    "sourceSize": {"w":32,"h":32},
+    "pivot": {"x":0.5,"y":0.5}
+  },
   "Top Tile":
   {
     "frame": {"x":34,"y":36,"w":416,"h":32},
