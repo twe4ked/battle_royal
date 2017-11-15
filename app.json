@@ -1,0 +1,6 @@
+{
+  "name": "Battle Royal",
+  "description": "A top-down multiplayer shooter with a Heroku button because why not",
+  "repository": "https://github.com/heroku/node-js-sample",
+  "keywords": ["node", "game", "pixi-js", "socket-io"]
+}
